@@ -1,0 +1,120 @@
+Movimiento y pila
+- mov dest, src
+  Utilidad: copiar datos entre registros, inmediatos y memoria.
+  Ejemplo: mov rax, rdi
+  Nota: NO afecta flags (excepto movs/movsb). Usar lea para calcular direcciones sin lectura de memoria.
+
+- lea dest, [mem]
+  Utilidad: cargar la dirección calculada en un registro (útil para aritmética de punteros).
+  Ejemplo: lea rax, [rdi + rcx]
+
+- push reg/imm / pop reg
+  Utilidad: almacenar o recuperar valores desde la pila; común en prologue/epilogue y llamadas.
+  Ejemplo: push rbp / pop rbp
+  Cuidado: RSP debe quedar alineado en llamadas ABI (16 bytes al llamar a funciones en x86_64).
+
+Aritmética
+- add, sub, inc, dec
+  Utilidad: sumas/restas simples; modificar índices y contadores.
+  Ejemplo: add rax, 1
+
+- imul, mul, idiv, div
+  Utilidad: multiplicación/ división; mul/ div usan RAX/RDX para resultados extendidos.
+  Ejemplo: imul rax, rbx
+
+- adc, sbb, neg
+  Utilidad: operaciones con carry/borrow para aritmética de múltiples palabras.
+
+Lógicos y bits
+- and, or, xor, not
+  Utilidad: enmascarar, unir o invertir bits; xor reg, reg es idiomático para poner a cero un registro.
+  Ejemplo: xor rax, rax
+
+- shl, shr, sar / rol, ror
+  Utilidad: desplazamientos y rotaciones para multiplicar/dividir por potencias de dos u operaciones bitwise.
+
+Comparación y pruebas
+- cmp op1, op2
+  Utilidad: compara valores y ajusta flags para saltos condicionales posteriores.
+  Ejemplo: cmp al, 0
+
+- test op1, op2
+  Utilidad: realiza AND lógico sobre operandos y ajusta flags sin almacenar resultado (útil para verificar cero/bit).
+  Ejemplo: test rax, rax
+
+Saltos y control de flujo
+- jmp label / je / jne / jl / jg / jb / ja / etc.
+  Utilidad: control de flujo; je salta si ZF=1 (igual), jb si carry (unsigned less), jl para signed.
+  Ejemplo: je .fin
+
+- call label / ret
+  Utilidad: llamar funciones y volver; call empuja la dirección de retorno en la pila.
+  Nota: respetar convenciones de pila y registros callee-saved.
+
+Instrucciones de cadena / bloques de memoria
+- movsb/movsw/movsd/movsq, stosb, scasb, lodsb
+  Utilidad: copiar o comparar bloques de memoria; usadas con rep/repe/repne para mover grandes cantidades.
+  Ejemplo: rep movsb ; copia ECX bytes de [rsi] a [rdi]
+
+- rep / repe / repne
+  Utilidad: repetir la instrucción anterior ECX veces (o RCX en 64-bit con prefijos adecuados).
+
+Syscalls / interrupciones
+- syscall
+  Utilidad: invocar llamada al kernel en x86_64 Linux; parámetros en registros (RDI, RSI, RDX, R10, R8, R9), número en RAX.
+  Ejemplo: mov rax, 1 ; mov rdi, 1 ; syscall
+
+- int 0x80
+  Utilidad: antiguo método 32-bit, no recomendado para x86_64 moderno.
+
+FPU / SIMD (resumen)
+- x87: fld, fstp, fadd...
+- SSE/AVX: movaps, addps, vmovdqa...
+  Utilidad: operaciones vectoriales y de punto flotante; útiles para optimización numérica, no necesarios para código básico de cadenas.
+
+Modos de direccionamiento
+- [reg], [reg + disp], [base + index*scale + disp]
+  Utilidad: acceder a memoria con offset y escala.
+  Ejemplo: mov al, [rdi + rax] ; leer byte en rdi+rax
+
+Directivas y pseudo‑instrucciones (NASM)
+- section .text / .data / .bss
+  Utilidad: separar código, datos inicializados y espacio reservado.
+
+- global symbol / extern symbol
+  Utilidad: exportar símbolos para enlazador o declarar símbolos externos (p. ej. funciones C).
+
+- db, dw, dd, dq
+  Utilidad: definir bytes/palabras/dwords/quadwords de datos constantes.
+  Ejemplo: msg db "hola", 0
+
+- resb, resw, resq
+  Utilidad: reservar espacio en .bss sin inicializar.
+
+- equ, times, align, org, bits 64
+  Utilidad: macros y alineación para organizar datos y código.
+
+Herramientas y utilidades
+- nasm -f elf64 file.s -o file.o
+  Utilidad: ensamblador principal para sintaxis NASM (Intel).
+
+- ld / gcc (linker)
+  Utilidad: enlazar objeto(s) en ejecutable o librería; gcc maneja opciones ABI y PIE por defecto.
+
+- objdump / nm / readelf / gdb
+  Utilidad: inspección y depuración de binarios y símbolos.
+
+Notas prácticas y ABI
+- Convención System V x86_64: argumentos en RDI, RSI, RDX, RCX, R8, R9; retorno en RAX.
+- Registros callee-saved: RBX, RSP, RBP, R12-R15 (si tu función los modifica, debes guardarlos y restaurarlos).
+- Alineación de pila: antes de llamar a una función, RSP debe estar alineado a 16 bytes (convention de GCC).
+- Seguridad: evitar accesos fuera de límites; la memoria no validada puede causar segfaults.
+
+Ejemplos rápidos:
+- Inicializar contador: xor rax, rax    ; RAX = 0
+- Leer byte: mov al, [rdi + rax]
+- Comparar con cero: cmp al, 0
+- Incrementar: inc rax
+- Saltar si no cero: jne .loop
+
+Este archivo resume la utilidad y comportamiento de las instrucciones y directivas más usadas para empezar a programar en NASM/x86_64. Úsalo como referencia rápida al implementar funciones como ft_strlen y al
