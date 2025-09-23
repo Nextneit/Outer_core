@@ -15,10 +15,10 @@ NASMFLAGS = -f elf64
 # Directories
 SRCDIR = src
 OBJDIR = obj
-LIBFTDIR = ../libft
+LIBFTDIR = libft
 
 # Files
-SRCS = 
+SRCS = main.c utils.c stub.c elf_parser.c
 OBJS = $(SRCS:%.c=$(OBJDIR)/%.o)
 
 # Libraries
