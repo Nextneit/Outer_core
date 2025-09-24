@@ -71,5 +71,3 @@ void xor_encrypt(unsigned char *data, size_t len, unsigned char *key, size_t key
 		i++;
     }
 }
-
-int	create_woody_file(void *original_file, size_t size, unsigned)
