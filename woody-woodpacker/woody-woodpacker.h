@@ -11,6 +11,9 @@
 	#include <time.h>			// Para generar claves aleatorias
 	#include <sys/syscall.h>	// Syscalls directas
 
+	// Utils define
+	#define	KEY_SIZE 16
+
 	// Constantes ELF
 	#define EI_NIDENT 16	//Tamaño del array
 	#define ELFMAG0 0x7f	//Primer byte
@@ -78,6 +81,13 @@
 
 	//Utils
 	size_t	get_file_size(int fd);
+	int		print_magic_number(void *file, size_t size);
+	void	print_key(unsigned char *key, size_t len);
+
+	//Crypto
+	void	generate_random_key(unsigned char* key, size_t len);
+	int		encrypt_segment(void *file, size_t size, unsigned char *key);
+	void 	xor_encrypt(unsigned char *data, size_t len, unsigned char *key, size_t key_len);
 
 	//Parse
 	int		parse_elf64(void *file, size_t size);

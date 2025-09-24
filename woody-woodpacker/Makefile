@@ -4,7 +4,7 @@ RED = \033[0;31m
 NC = \033[0m
 
 # Project
-NAME = woody
+NAME = woody_woodpacker
 
 # Compiler
 CC = gcc
@@ -18,7 +18,7 @@ OBJDIR = obj
 LIBFTDIR = libft
 
 # Files
-SRCS = main.c utils.c stub.c elf_parser.c
+SRCS = main.c utils.c stub.c elf_parser.c crypto.c
 OBJS = $(SRCS:%.c=$(OBJDIR)/%.o)
 
 # Libraries
