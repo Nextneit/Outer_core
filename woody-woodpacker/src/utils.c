@@ -37,3 +37,39 @@ void	print_key(unsigned char *key, size_t len){
 	}
 	printf("\n");
 }
+
+uint64_t	find_encrypted_segment_offset(void *file){
+	Elf64_Ehdr	*data;
+	Elf64_Phdr	*headers;
+	Elf64_Phdr	*segment;
+	int			i;
+
+	data = (Elf64_Ehdr *)file;
+	headers = (Elf64_Phdr *)((char *)file + data->e_phoff);
+	i = 0;
+	while (i < data->e_phnum){
+		segment = &headers[i];
+		if (segment->p_type == PT_LOAD && (segment->p_flags & PF_X))
+			return (segment->p_offset);
+		i++;
+	}
+	return (EXIT_FAILURE);
+}
+
+size_t	find_encrypted_segment_size(void *file){
+	Elf64_Ehdr	*data;
+	Elf64_Phdr	*headers;
+	Elf64_Phdr	*segment;
+	int			i;
+
+	data = (Elf64_Ehdr *)file;
+	headers = (Elf64_Phdr *)((char *)file + data->e_phoff);
+	i = 0;
+	while (i < data->e_phnum){
+		segment = &headers[i];
+		if (segment->p_type == PT_LOAD && (segment->p_flags & PF_X))
+			return (segment->p_filesz);
+		i++;
+	}
+	return (EXIT_FAILURE);
+}

@@ -26,6 +26,6 @@ unsigned char decryption_stub[] = {
 };
 
 size_t decryption_stub_size = sizeof(decryption_stub);
-
-unsigned char woody_message[] = "....WOODY.....\n";
-size_t woody_message_size = sizeof(woody_message) - 1;
+/*
+unsigned char woody_message* = "....WOODY.....\n";
+size_t woody_message_size = sizeof(woody_message) - 1;*/
