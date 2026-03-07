@@ -13,6 +13,7 @@
 
 	// Utils define
 	#define	KEY_SIZE 16
+	#define	STUB_SIZE 240		// Tamaño del stub bytecode (src/stub.bin)
 
 	// Constantes ELF
 	#define EI_NIDENT 16	//Tamaño del array
@@ -27,6 +28,7 @@
 	#define ET_DYN  3		//Shared object/PIE
 
 	#define PT_LOAD    1	//Segmento cargable en memoria
+	#define PT_NOTE    4	//Segmento de notas (hijackeado para el stub)
 	#define PF_X 1 			//Ejecutable
 	#define PF_W 2  		//Escribible
 	#define PF_R 4  		//Legible
@@ -73,23 +75,25 @@
 		uint64_t sh_entsize;   // Tamaño de entradas (si es tabla)
 	} Elf64_Shdr;
 
-	// ✅ SOLO DECLARACIONES (extern) - NO DEFINICIONES
-    extern unsigned char decryption_stub[];
-    extern size_t decryption_stub_size;
-    extern unsigned char woody_message[];
-    extern size_t woody_message_size;
-
 	//Utils
-	size_t	get_file_size(int fd);
-	int		print_magic_number(void *file, size_t size);
-	void	print_key(unsigned char *key, size_t len);
+	size_t		get_file_size(int fd);
+	int			print_magic_number(void *file, size_t size);
+	void		print_key(unsigned char *key, size_t len);
+	uint64_t	find_encrypted_segment_offset(void *file);
+	size_t		find_encrypted_segment_size(void *file);
 
 	//Crypto
-	void	generate_random_key(unsigned char* key, size_t len);
+	void	generate_random_key(unsigned char *key, size_t len);
 	int		encrypt_segment(void *file, size_t size, unsigned char *key);
-	void 	xor_encrypt(unsigned char *data, size_t len, unsigned char *key, size_t key_len);
+	void	xor_encrypt(unsigned char *data, size_t len, unsigned char *key, size_t key_len);
 
 	//Parse
 	int		parse_elf64(void *file, size_t size);
+
+	//Inject
+	int		inject_stub(void *file, size_t file_size, unsigned char *key, uint64_t orig_entry);
+
+	//Output
+	int		write_woody(void *file, size_t file_size);
 
 #endif

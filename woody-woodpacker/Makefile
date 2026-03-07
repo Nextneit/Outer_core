@@ -18,7 +18,7 @@ OBJDIR = obj
 LIBFTDIR = libft
 
 # Files
-SRCS = main.c utils.c stub.c elf_parser.c crypto.c
+SRCS = main.c utils.c inject_stub.c write_woody.c elf_parser.c crypto.c
 OBJS = $(SRCS:%.c=$(OBJDIR)/%.o)
 
 # Libraries
