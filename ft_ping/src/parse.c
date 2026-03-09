@@ -10,12 +10,12 @@ void	print_help(void)
     printf("Report bugs to <your_email@example.com>.\n");
 }
 
-static int	parse_options(int argc, char **argv, t_ping_config *config, int *target){
+static int	parse_options(int argc, char **argv, t_ping_config *config, int target){
 	int	i;
 
 	i = 1;
 	config->verbose = false;
-	*target = -1;
+	target = -1;
 	while (i < argc){
 		if (argv[i][0] == '-'){
 			if (strncmp(argv[i], "-v", strlen(argv[i])) == 0)
@@ -29,19 +29,22 @@ static int	parse_options(int argc, char **argv, t_ping_config *config, int *targ
 				return (printf("ft_ping: invalid option '%s'\n", argv[i]), 1);
 		}
 		else{
-			if (*target != -1)
+			if (target != -1)
 				return (printf("ft_ping: too many arguments\n"), 1);
-			*target = i;
+			target = i;
+			config->target = argv[i];
 		}
 		i++;
 	}
+	if (config->target == NULL)
+		return (printf("Error: missing host operand\n"), 1);
 	return (0);
 }
 
 int	parse_arguments(int argc, char **argv, t_ping_config *config){
-	int	*target;
+	int	target;
 	
-	target = 0;
+	target = -1;
 	if (argc < 2)
 		return (printf("Error: missing host operand\n"), 1);
 	if (parse_options(argc, argv, config, target) == 1)

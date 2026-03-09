@@ -58,14 +58,14 @@ int     parse_arguments(int argc, char **argv, t_ping_config *config);
 void    print_help(void);
 
 // icmp.c
-void    create_icmp_packet(/* params */);
+void    create_icmp_packet(char *packet, uint16_t sequence);
 int     parse_icmp_reply(/* params */);
 uint16_t calculate_checksum(uint16_t *addr, int len);
 
 // network.c
 int     create_raw_socket(void);
-int     send_ping(/* params */);
-int     receive_ping(/* params */);
+int     send_ping(t_ping_config *config);
+int     receive_ping(t_ping_config *config, struct timeval *send_time);
 
 // dns.c
 int     resolve_hostname(const char *hostname, char *ip);

@@ -22,7 +22,7 @@ OBJDIR     = obj
 INCDIR     = include
 
 # Files
-SRCS        = main.c parse.c
+SRCS        = main.c parse.c dns.c icmp.c network.c
 OBJS        = $(SRCS:%.c=$(OBJDIR)/%.o)
 
 # Includes
