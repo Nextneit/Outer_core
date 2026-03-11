@@ -94,7 +94,8 @@ gcc -o hello hello.c
 ```
 woody-woodpacker/
 ├── Makefile
-├── woody-woodpacker.h       # Global header (types, structs, constants)
+├── include/
+│   └── woody-woodpacker.h   # Global header (types, structs, constants)
 ├── libft/                   # Custom C library
 └── src/
     ├── main.c               # Entry point and orchestration
