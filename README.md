@@ -52,7 +52,7 @@ Cada vulnerabilidad tiene su flag y su write-up en `<vuln>/resources/README.md`.
 ## dr-quine
 
 **Ruta:** [`dr-quine/`](dr-quine/)
-**Documentación:** [C](dr-quine/C/README.md) · [ASM](dr-quine/ASM/README.md)
+**Documentación:** [C](dr-quine/C/README.md) · [ASM](dr-quine/ASM/README.md) · [Python](dr-quine/Python/README.md)
 
 Implementación de **quines** — programas que imprimen su propio código fuente exacto sin leer ningún fichero externo. El proyecto incluye tres variantes de complejidad creciente (`Colleen`, `Grace`, `Sully`), cada una implementada en **C** y en **x86-64 Assembly** (NASM).
 
@@ -63,6 +63,7 @@ Explora los conceptos de auto-referencia, formato posicional de `printf` y meta-
 ## ft_ping
 
 **Ruta:** [`ft_ping/`](ft_ping/)
+**Documentación:** [README](ft_ping/README.md)
 
 Reimplementación del comando `ping` estándar en C, usando **sockets raw ICMP**. Resuelve nombres de host vía DNS, construye y envía paquetes ICMP Echo Request, y calcula estadísticas de round-trip time (RTT).
 
