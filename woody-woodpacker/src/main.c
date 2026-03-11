@@ -1,4 +1,4 @@
-#include "../woody-woodpacker.h"
+#include "woody-woodpacker.h"
 
 int	main(int argc, char **argv)
 {

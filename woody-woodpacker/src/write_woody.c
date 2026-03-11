@@ -1,4 +1,4 @@
-#include "../woody-woodpacker.h"
+#include "woody-woodpacker.h"
 
 /*
 ** write_woody — Escribe el ELF modificado (archivo original + stub) en

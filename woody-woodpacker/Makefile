@@ -23,7 +23,7 @@ OBJS = $(SRCS:%.c=$(OBJDIR)/%.o)
 
 # Libraries
 LIBFT = $(LIBFTDIR)/libft.a
-INCLUDES = -I$(LIBFTDIR)/includes
+INCLUDES = -Iinclude -I$(LIBFTDIR)/includes
 
 # Main targets
 all: $(NAME)

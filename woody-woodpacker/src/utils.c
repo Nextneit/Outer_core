@@ -1,4 +1,4 @@
-#include "../woody-woodpacker.h"
+#include "woody-woodpacker.h"
 
 size_t	get_file_size(int fd){
 	off_t	current;

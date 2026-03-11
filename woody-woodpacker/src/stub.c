@@ -1,4 +1,4 @@
-#include "../woody-woodpacker.h"
+#include "woody-woodpacker.h"
 
 // ✅ DEFINICIÓN - Solo aquí
 unsigned char decryption_stub[] = {

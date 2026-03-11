@@ -1,4 +1,4 @@
-#include "../woody-woodpacker.h"
+#include "woody-woodpacker.h"
 
 void	generate_random_key(unsigned char* key, size_t len){
 	int		fd;

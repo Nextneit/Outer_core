@@ -1,4 +1,4 @@
-#include "../woody-woodpacker.h"
+#include "woody-woodpacker.h"
 
 int	parse_elf64(void *file, size_t size){
 	Elf64_Ehdr	*tmp;
