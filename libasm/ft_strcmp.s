@@ -40,12 +40,11 @@ ft_strcmp:
 	jmp .compare
 
 .compare_last:
-	;final comparison of current characters
-	mov		dl, BYTE [rdi + rcx]
-	sub		dl, BYTE [rsi + rcx]
-	cmp		dl, 0
-	jz		.same
-	jl		.smaller
+	;final comparison: return unsigned byte difference (matches libc strcmp)
+	movzx	eax, BYTE [rdi + rcx]
+	movzx	edx, BYTE [rsi + rcx]
+	sub		eax, edx
+	ret
 
 .bigger:
 	;return 1 if str1 > str2
