@@ -1,7 +1,7 @@
 #include "../include/ft_ping.h"
 
 uint16_t	calculate_checksum(uint16_t *addr, int len){
-	uint16_t	sum;
+	uint32_t	sum;
 	uint16_t	*w;
 	uint16_t	answer;
 	int			nleft;
@@ -25,11 +25,12 @@ uint16_t	calculate_checksum(uint16_t *addr, int len){
 	return (answer);
 }
 
-void	create_icmp_packet(char *packet, uint16_t sequence){
+void	create_icmp_packet(char *packet, uint16_t sequence, int size){
 	struct icmp *icmp_hdr;
 	int			i;
 	
-	memset(packet, 0, PACKET_SIZE);
+	// size = bytes de datos, +8 = cabecera ICMP
+	memset(packet, 0, size + 8);
 	icmp_hdr = (struct icmp *)packet;
 	icmp_hdr->icmp_type = ICMP_ECHO;
 	icmp_hdr->icmp_code = 0;
@@ -37,9 +38,9 @@ void	create_icmp_packet(char *packet, uint16_t sequence){
 	icmp_hdr->icmp_seq = sequence;
 	icmp_hdr->icmp_cksum = 0;
 	i = sizeof(struct icmp);
-	while (i < PACKET_SIZE){
+	while (i < size + 8){
 		packet[i] = i;
 		i++;
 	}
-	icmp_hdr->icmp_cksum = calculate_checksum((uint16_t*)packet, PACKET_SIZE);
+	icmp_hdr->icmp_cksum = calculate_checksum((uint16_t*)packet, size + 8);
 }

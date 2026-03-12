@@ -8,6 +8,7 @@
 # include <stdbool.h>    // bool, true, false
 # include <stdint.h>     // uint8_t, uint16_t, uint32_t, uint64_t
 # include <unistd.h>     // getpid, getuid
+# include <math.h>
 
 // Para sockets y red
 # include <sys/socket.h> // socket, setsockopt, sendto, recvfrom
@@ -46,8 +47,13 @@ typedef struct s_ping_stats {
 typedef struct s_ping_config {
     char            *target;        // Hostname o IP
     char            resolved_ip[INET_ADDRSTRLEN];
-    bool            verbose;        // Flag -v
+    bool            verbose;        // -v
+    bool            no_dns;         // -n  (no resolver hostname en output)
     int             sockfd;
+    int             ttl;            // --ttl (reemplaza DEFAULT_TTL)
+    int             packet_size;    // -s   (reemplaza PACKET_SIZE)
+    int             timeout_ms;     // -W   (timeout por paquete en ms)
+    int             deadline;       // -w   (deadline total en segundos, 0 = sin límite)
     uint16_t        sequence;
     t_ping_stats    stats;
     struct timeval  start_time;
@@ -58,12 +64,11 @@ int     parse_arguments(int argc, char **argv, t_ping_config *config);
 void    print_help(void);
 
 // icmp.c
-void    create_icmp_packet(char *packet, uint16_t sequence);
-int     parse_icmp_reply(/* params */);
+void    create_icmp_packet(char *packet, uint16_t sequence, int size);
 uint16_t calculate_checksum(uint16_t *addr, int len);
 
 // network.c
-int     create_raw_socket(void);
+int     create_raw_socket(t_ping_config *config);
 int     send_ping(t_ping_config *config);
 int     receive_ping(t_ping_config *config, struct timeval *send_time);
 
@@ -71,10 +76,9 @@ int     receive_ping(t_ping_config *config, struct timeval *send_time);
 int     resolve_hostname(const char *hostname, char *ip);
 
 // statistics.c
-void    update_statistics(/* params */);
-void    print_statistics(/* params */);
+void    print_statistics(t_ping_config *config);
 
 // signals.c
-void    setup_signal_handlers(void);
+void    setup_signal_handlers(t_ping_config *config);
 
 #endif
