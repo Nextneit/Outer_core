@@ -52,10 +52,11 @@ pip install requests beautifulsoup4
 
 ## Exercise 01 — Scorpion
 
-A metadata extraction tool for image files. Parses EXIF data and basic file attributes and displays them in a structured format.
+A forensic metadata extraction, manipulation, and sanitization tool for image files. It parses EXIF data and basic file attributes, allowing users to deeply analyze media.
 
-### Usage
+### Usage (CLI Mode)
 
+To extract and display read-only metadata from one or multiple files in the terminal:
 ```bash
 python3 scorpion.py FILE1 [FILE2 ...]
 ```
@@ -64,26 +65,33 @@ python3 scorpion.py FILE1 [FILE2 ...]
 
 `.jpg` / `.jpeg` / `.png` / `.gif` / `.bmp`
 
-### Output
+### Output (CLI)
 
 For each file, Scorpion displays:
 
 - Image format, color mode, and dimensions
 - File size in bytes
 - Creation and last modification timestamps
-- All available EXIF tags with human-readable labels
+- All available EXIF tags (or PNG info chunks) with human-readable labels
 
-### Examples
+### Bonus Features (GUI Mode)
 
+Scorpion includes a complete **Graphical User Interface (GUI)** using `tkinter` that enables advanced anti-forensic capabilities (Metadata Modification and Destruction).
+
+To launch the GUI, run the command without any file arguments:
 ```bash
-python3 scorpion.py photo.jpg
-python3 scorpion.py img1.png img2.jpg img3.bmp
+python3 scorpion.py
 ```
+
+**GUI Capabilities:**
+- **Visual Table:** Instantly browse through image properties in an interactive and scrollable metadata tree.
+- **Strip EXIF (Clean):** With the click of a button, permanently delete all tracking data (GPS, Camera Make, Software) from`.jpg` and `.png` files, exporting a 100% sanitized copy.
+- **Save Modified EXIF:** Edit rows directly in the visual table and inject the manipulated metadata back into a fresh image to create decoys or bypass filters.
 
 ### Dependencies
 
 ```bash
-pip install Pillow
+pip install Pillow piexif
 ```
 
 ---
