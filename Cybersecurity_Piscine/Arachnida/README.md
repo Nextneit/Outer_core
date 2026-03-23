@@ -54,11 +54,48 @@ pip install requests beautifulsoup4
 
 A forensic metadata extraction, manipulation, and sanitization tool for image files. It parses EXIF data and basic file attributes, allowing users to deeply analyze media.
 
-### Usage (CLI Mode)
+### Usage (CLI)
 
-To extract and display read-only metadata from one or multiple files in the terminal:
+General command:
+
+```bash
+python3 scorpion.py [--gui] [--strip] [--set KEY=VALUE ...] [--out OUTPUT] [FILE ...]
+```
+
+If run without arguments, Scorpion prints the help message.
+
+Read-only extraction for one or multiple files:
+
 ```bash
 python3 scorpion.py FILE1 [FILE2 ...]
+```
+
+### CLI Options
+
+| Flag | Description |
+|------|-------------|
+| `--gui` | Launch graphical interface |
+| `--strip` | Remove metadata from exactly one input file (`.jpg/.jpeg/.png`) |
+| `--set KEY=VALUE` | Set/modify metadata (repeatable). Requires exactly one input file |
+| `--out OUTPUT` | Output path used with `--strip` or `--set` |
+
+Examples:
+
+```bash
+# Show read-only metadata
+python3 scorpion.py image.jpg
+
+# Strip metadata
+python3 scorpion.py --strip image.jpg --out cleaned.jpg
+
+# Modify JPEG metadata (EXIF tags)
+python3 scorpion.py image.jpg --set 0th.Artist="ncruz" --set Exif.UserComment="test" --out modified.jpg
+
+# Modify PNG text metadata
+python3 scorpion.py image.png --set Author="ncruz" --set Description="demo" --out modified.png
+
+# Launch GUI explicitly
+python3 scorpion.py --gui
 ```
 
 ### Supported Extensions
@@ -78,15 +115,24 @@ For each file, Scorpion displays:
 
 Scorpion includes a complete **Graphical User Interface (GUI)** using `tkinter` that enables advanced anti-forensic capabilities (Metadata Modification and Destruction).
 
-To launch the GUI, run the command without any file arguments:
+To launch the GUI:
+
 ```bash
-python3 scorpion.py
+python3 scorpion.py --gui
 ```
 
 **GUI Capabilities:**
 - **Visual Table:** Instantly browse through image properties in an interactive and scrollable metadata tree.
-- **Strip EXIF (Clean):** With the click of a button, permanently delete all tracking data (GPS, Camera Make, Software) from`.jpg` and `.png` files, exporting a 100% sanitized copy.
+- **Strip EXIF (Clean):** With the click of a button, permanently delete all tracking data (GPS, Camera Make, Software) from `.jpg` and `.png` files, exporting a 100% sanitized copy.
 - **Save Modified EXIF:** Edit rows directly in the visual table and inject the manipulated metadata back into a fresh image to create decoys or bypass filters.
+
+### Internal Architecture (Refactor)
+
+Scorpion is split into clear layers:
+
+- `scorpion.py`: CLI entry point and flow control.
+- `gui_bonus.py`: all GUI creation, layout, and GUI interactions.
+- `metadata_service.py`: shared metadata business logic (read/parse/convert/strip/modify) used by both CLI and GUI.
 
 ### Dependencies
 
@@ -104,6 +150,8 @@ Arachnida/
 │   ├── spider.py
 │   └── requirements.txt
 └── ex01/
+    ├── gui_bonus.py
+    ├── metadata_service.py
     ├── scorpion.py
     └── requirements.txt
 ```
