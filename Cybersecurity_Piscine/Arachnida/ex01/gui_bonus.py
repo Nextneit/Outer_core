@@ -9,7 +9,6 @@ from metadata_service import (
     MODIFIABLE_EXTENSIONS,
     get_basic_info,
     load_metadata_rows,
-    format_exif_value,
     convert_user_value_for_exif,
     strip_metadata,
     write_jpeg_exif,
