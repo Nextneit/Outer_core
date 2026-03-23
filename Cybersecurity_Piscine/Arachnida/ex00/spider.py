@@ -21,7 +21,7 @@ def download_image(url, dest):
         response.raise_for_status()
         save_image_response(url, response, dest)
     except Exception as e:
-        print(f"[ERROR] No se pudo descargar {url} - {e}")
+        print(f"[ERROR] Could not download {url} - {e}")
 
 
 def process_image_url(url, dest, seen_images):
@@ -55,7 +55,7 @@ def build_unique_filename(url, ext, fallback_base='image'):
     path = urlparse(url).path
     base_name = os.path.basename(path)
     stem = os.path.splitext(base_name)[0] or fallback_base
-    # Hash corto y estable para evitar colisiones entre URLs distintas.
+    # Short and stable hash to avoid collisions between different URLs.
     short_hash = hashlib.sha1(url.encode('utf-8')).hexdigest()[:10]
     return f"{stem}_{short_hash}{ext}"
 
@@ -67,27 +67,27 @@ def save_image_response(url, response, dest):
     ext = os.path.splitext(filename)[1].lower()
     inferred_ext = infer_extension_from_content_type(content_type)
 
-    # Criterio 1: extension permitida en la URL.
-    # Criterio 2: URL sin extension (o extension no valida) pero MIME permitido.
+    # Criterion 1: allowed extension in the URL.
+    # Criterion 2: URL without extension (or invalid extension) but allowed MIME.
     if ext in ALLOWED_EXTENSIONS:
         final_ext = ext
     elif inferred_ext in ALLOWED_EXTENSIONS:
         final_ext = inferred_ext
     else:
-        print(f"[SKIP] Formato no permitido: {url} (Content-Type: {content_type or 'desconocido'})")
+        print(f"[SKIP] Unsupported format: {url} (Content-Type: {content_type or 'unknown'})")
         return
 
-    # Generar un nombre unico y estable para evitar colisiones entre rutas.
+    # Generate a stable unique name to avoid collisions between paths.
     filename = build_unique_filename(url, final_ext)
     file_path = os.path.join(dest, filename)
 
     if os.path.exists(file_path):
-        print(f"[SKIP] Ya existe: {filename}")
+        print(f"[SKIP] Already exists: {filename}")
         return
 
     with open(file_path, 'wb') as f:
         f.write(response.content)
-    print(f"[OK] Descargada: {filename} -> {dest}")
+    print(f"[OK] Downloaded: {filename} -> {dest}")
 
 
 def scrape(url, dest, recursive, depth, visited=None, seen_images=None):
@@ -99,35 +99,35 @@ def scrape(url, dest, recursive, depth, visited=None, seen_images=None):
         return
     visited.add(url)
     
-    print(f"\n[*] Analizando URL (Profundidad restante: {depth}): {url}")
+    print(f"\n[*] Analyzing URL (Remaining depth: {depth}): {url}")
     
     try:
         response = requests.get(url, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
     except Exception as e:
-        print(f"[ERROR] No se pudo acceder a {url} - {e}")
+        print(f"[ERROR] Could not access {url} - {e}")
         return
 
     content_type = response.headers.get('Content-Type', '').lower()
     if infer_extension_from_content_type(content_type) in ALLOWED_EXTENSIONS:
         process_image_response(url, response, dest, seen_images)
-        print(f"[INFO] Saltando parseo HTML en {url} (Content-Type: {content_type or 'desconocido'})")
+        print(f"[INFO] Skipping HTML parsing for {url} (Content-Type: {content_type or 'unknown'})")
         return
 
     if not is_html_content_type(content_type):
-        print(f"[INFO] Saltando parseo HTML en {url} (Content-Type: {content_type or 'desconocido'})")
+        print(f"[INFO] Skipping HTML parsing for {url} (Content-Type: {content_type or 'unknown'})")
         return
         
     soup = BeautifulSoup(response.text, 'html.parser')
     images_found = soup.find_all('img')
-    print(f"[INFO] Encontradas {len(images_found)} etiquetas <img> en esta página.")
+    print(f"[INFO] Found {len(images_found)} <img> tags on this page.")
     
     for img in images_found:
         src = img.get('src')
         if not src:
             continue
         if src.startswith('data:'):
-            print("[SKIP] Imagen embebida en data URI.")
+            print("[SKIP] Embedded image in data URI.")
             continue
         full_url = urljoin(url, src)
         process_image_url(full_url, dest, seen_images)
@@ -141,24 +141,24 @@ def scrape(url, dest, recursive, depth, visited=None, seen_images=None):
             linked_images += 1
 
     if linked_images:
-        print(f"[INFO] Descargadas {linked_images} imágenes desde enlaces <a>.")
+        print(f"[INFO] Downloaded {linked_images} images from <a> links.")
     
     if recursive:
         pending_links = []
         for a in links_found:
             link = urljoin(url, a['href'])
-            # Asegurarse de que el enlace sea del mismo dominio y no se haya visitado ya
+            # Ensure the link is in the same domain and was not already visited.
             if urlparse(link).netloc == urlparse(url).netloc and link not in visited:
                 pending_links.append(link)
 
         if depth > 0:
-            print(f"[INFO] Buscando enlaces para recursividad... ({len(links_found)} enlaces evaluados)")
+            print(f"[INFO] Searching links for recursion... ({len(links_found)} links evaluated)")
             for link in pending_links:
                 scrape(link, dest, recursive, depth - 1, visited, seen_images)
         elif pending_links:
             print(
-                f"[INFO] Límite de profundidad alcanzado en {url}. "
-                f"Quedan {len(pending_links)} enlaces pendientes sin visitar."
+                f"[INFO] Depth limit reached at {url}. "
+                f"{len(pending_links)} pending links remain unvisited."
             )
       
 
@@ -170,15 +170,15 @@ def main():
     parser.add_argument('-p', default='./data/', help='Save path (default: ./data/)')
     args = parser.parse_args()
 
-    print(f"--- Iniciando Spider ---")
+    print(f"--- Starting Spider ---")
     print(f"URL: {args.url}")
-    print(f"Ruta: {args.p}")
-    print(f"Recursividad: {'ON' if args.r else 'OFF'} (Prof: {args.l})")
+    print(f"Path: {args.p}")
+    print(f"Recursion: {'ON' if args.r else 'OFF'} (Depth: {args.l})")
     print(f"------------------------\n")
 
     os.makedirs(args.p, exist_ok=True)
     scrape(args.url, args.p, args.r, args.l)
-    print("\n[+] Extracción finalizada.")
+    print("\n[+] Extraction finished.")
 
 if __name__ == '__main__':
     main()
