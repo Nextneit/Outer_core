@@ -5,11 +5,13 @@ SPIDER = python3 spider.py
 DATA_DIR_BMP = ./data_bmp
 DATA_DIR_PICSUM = ./data_picsum
 DATA_DIR_BOOKS = ./data_books
+DATA_DIR_TENOR = ./data_tenor
+DATA_DIR_TENOR_RECURSIVE = ./data_tenor_recursive
 DATA_DIR_RECURSIVE = ./data_recursive
 DATA_DIR_DEPTH = ./data_depth
 
 # Default test: non-recursive scraping on all URLs
-test: clean test-urls
+test: clean test-urls test-tenor
 	@echo "\n[✓] All standard tests completed!"
 
 # Test each URL individually (non-recursive)
@@ -20,6 +22,16 @@ test-urls:
 	@$(SPIDER) https://picsum.photos/images -p $(DATA_DIR_PICSUM)
 	@echo "\n[TEST 3] Scraping Books.toscrape (non-recursive)..."
 	@$(SPIDER) https://books.toscrape.com/ -p $(DATA_DIR_BOOKS)
+
+# Test GIF scraping from Tenor (non-recursive)
+test-tenor:
+	@echo "\n[TEST 4] Scraping Tenor GIFs (non-recursive)..."
+	@$(SPIDER) https://tenor.com/ -p $(DATA_DIR_TENOR)
+
+# Test GIF scraping from Tenor (recursive)
+test-tenor-recursive: clean
+	@echo "\n[TENOR RECURSIVE TEST] Testing recursive scraping on Tenor (depth 2)..."
+	@$(SPIDER) https://tenor.com/ -r -l 2 -p $(DATA_DIR_TENOR_RECURSIVE)
 
 # Test recursive scraping
 test-recursive: clean
@@ -38,24 +50,27 @@ test-depth-5: clean
 # Clean all test data directories
 clean:
 	@echo "[CLEAN] Removing test data directories..."
-	@rm -rf $(DATA_DIR_BMP) $(DATA_DIR_PICSUM) $(DATA_DIR_BOOKS) $(DATA_DIR_RECURSIVE) $(DATA_DIR_DEPTH)
+	@rm -rf $(DATA_DIR_BMP) $(DATA_DIR_PICSUM) $(DATA_DIR_BOOKS) $(DATA_DIR_TENOR) $(DATA_DIR_TENOR_RECURSIVE) $(DATA_DIR_RECURSIVE) $(DATA_DIR_DEPTH)
 	@echo "[CLEAN] Done!"
 
 # Help target
 help:
 	@echo "Spider Test Makefile - Available targets:"
 	@echo ""
-	@echo "  make test              - Run all standard tests (non-recursive)"
-	@echo "  make test-urls         - Test all URLs individually"
-	@echo "  make test-recursive    - Test recursive scraping (depth 2)"
-	@echo "  make test-depth-2      - Test with recursion depth 2"
-	@echo "  make test-depth-5      - Test with recursion depth 5"
-	@echo "  make clean             - Remove all test data directories"
-	@echo "  make help              - Show this help message"
+	@echo "  make test                - Run all standard tests (non-recursive)"
+	@echo "  make test-urls           - Test all standard URLs individually"
+	@echo "  make test-tenor          - Test Tenor GIFs (non-recursive)"
+	@echo "  make test-tenor-recursive- Test Tenor GIFs with recursion (depth 2)"
+	@echo "  make test-recursive      - Test recursive scraping (depth 2)"
+	@echo "  make test-depth-2        - Test with recursion depth 2"
+	@echo "  make test-depth-5        - Test with recursion depth 5"
+	@echo "  make clean               - Remove all test data directories"
+	@echo "  make help                - Show this help message"
 	@echo ""
 	@echo "Test URLs:"
-	@echo "  1. https://filesamples.com/formats/bmp"
-	@echo "  2. https://picsum.photos/images"
-	@echo "  3. https://books.toscrape.com/"
+	@echo "  1. https://filesamples.com/formats/bmp (BMP samples)"
+	@echo "  2. https://picsum.photos/images (Random photos)"
+	@echo "  3. https://books.toscrape.com/ (Book covers)"
+	@echo "  4. https://tenor.com/ (Animated GIFs)"
 
-.PHONY: test clean test-recursive test-depth-2 test-depth-5 test-urls help
+.PHONY: test clean test-recursive test-depth-2 test-depth-5 test-urls test-tenor test-tenor-recursive help
