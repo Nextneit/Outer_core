@@ -1,7 +1,7 @@
 # Spider Test Makefile
 # Standard scraping tests based on validated URLs
 
-SPIDER = python3 spider.py
+SPIDER = ./.venv/bin/python3 spider.py
 DATA_DIR_BMP = ./data_bmp
 DATA_DIR_PICSUM = ./data_picsum
 DATA_DIR_BOOKS = ./data_books
@@ -11,7 +11,7 @@ DATA_DIR_RECURSIVE = ./data_recursive
 DATA_DIR_DEPTH = ./data_depth
 
 # Default test: non-recursive scraping on all URLs
-test: clean test-urls test-tenor
+test: clean install test-urls test-tenor
 	@echo "\n[✓] All standard tests completed!"
 
 # Test each URL individually (non-recursive)
@@ -47,16 +47,29 @@ test-depth-5: clean
 	@echo "\n[DEPTH TEST] Depth level 5..."
 	@$(SPIDER) https://books.toscrape.com/ -r -l 5 -p $(DATA_DIR_DEPTH)
 
-# Clean all test data directories
+# Clean all test data directories and virtual environment
 clean:
-	@echo "[CLEAN] Removing test data directories..."
-	@rm -rf $(DATA_DIR_BMP) $(DATA_DIR_PICSUM) $(DATA_DIR_BOOKS) $(DATA_DIR_TENOR) $(DATA_DIR_TENOR_RECURSIVE) $(DATA_DIR_RECURSIVE) $(DATA_DIR_DEPTH)
+	@echo "[CLEAN] Removing test data directories and virtual environment..."
+	@rm -rf $(DATA_DIR_BMP) $(DATA_DIR_PICSUM) $(DATA_DIR_BOOKS) $(DATA_DIR_TENOR) $(DATA_DIR_TENOR_RECURSIVE) $(DATA_DIR_RECURSIVE) $(DATA_DIR_DEPTH) .venv
 	@echo "[CLEAN] Done!"
+
+# Setup virtual environment and install dependencies
+.venv:
+	@echo "[SETUP] Creating virtual environment..."
+	python3 -m venv .venv
+	@echo "[OK] Virtual environment created at ./.venv"
+
+install: .venv
+	@echo "[INSTALL] Installing dependencies from requirements.txt..."
+	./.venv/bin/pip install --upgrade pip
+	./.venv/bin/pip install -r requirements.txt
+	@echo "[OK] All dependencies installed. Activate with: source ./.venv/bin/activate"
 
 # Help target
 help:
 	@echo "Spider Test Makefile - Available targets:"
 	@echo ""
+	@echo "  make install             - Create venv and install dependencies"
 	@echo "  make test                - Run all standard tests (non-recursive)"
 	@echo "  make test-urls           - Test all standard URLs individually"
 	@echo "  make test-tenor          - Test Tenor GIFs (non-recursive)"
@@ -73,4 +86,4 @@ help:
 	@echo "  3. https://books.toscrape.com/ (Book covers)"
 	@echo "  4. https://tenor.com/ (Animated GIFs)"
 
-.PHONY: test clean test-recursive test-depth-2 test-depth-5 test-urls test-tenor test-tenor-recursive help
+.PHONY: test clean test-recursive test-depth-2 test-depth-5 test-urls test-tenor test-tenor-recursive install help
