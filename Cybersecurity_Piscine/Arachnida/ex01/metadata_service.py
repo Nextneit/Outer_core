@@ -175,6 +175,11 @@ def extract_exif(filepath):
 
     This is the read-only console path used when user passes file arguments
     without --strip / --set.
+    
+    Supports:
+    - JPEG: EXIF data from APP1 segment
+    - PNG: text chunks metadata
+    - BMP/GIF: basic file info + img.info dictionary
     """
     try:
         img = Image.open(filepath)
@@ -203,6 +208,20 @@ def extract_exif(filepath):
         for key, value in png_info.items():
             if key not in ['dpi', 'icc_profile', 'vpi']:
                 print(f"{key:<30}: {value}")
+    elif img.format in ('BMP', 'GIF'):
+        print(f'--- {img.format} METADATA ---')
+        info = img.info or {}
+        if info:
+            for key, value in info.items():
+                print(f"{key:<30}: {value}")
+        else:
+            # Metadatos básicos extraídos de la cabecera del formato
+            print(f"{'ColorMode':<30}: {img.mode}")
+            print(f"{'Width':<30}: {img.size[0]} px")
+            print(f"{'Height':<30}: {img.size[1]} px")
+            if img.format == 'GIF':
+                n_frames = getattr(img, 'n_frames', 1)
+                print(f"{'Frames':<30}: {n_frames}")
     else:
         print('No EXIF/Metadata found')
 
