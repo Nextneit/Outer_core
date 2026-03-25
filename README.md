@@ -1,128 +1,128 @@
 # Outer Core
 
-Colección de proyectos de bajo nivel, seguridad y sistemas. Cada carpeta es un proyecto independiente con su propia documentación.
+Collection of low-level, security, and systems projects. Each folder is an independent project with its own documentation.
 
 ---
 
-## Índice de proyectos
+## Project Index
 
-| Proyecto | Área | Descripción breve |
+| Project | Area | Brief Description |
 |---|---|---|
-| [Cybersecurity_Piscine/Arachnida](#arachnida) | Ciberseguridad | Web scraper de imágenes + extractor de metadatos EXIF |
-| [Cybersecurity_Piscine/ft_otp](#ft_otp) | Ciberseguridad | Generador TOTP (One-Time Password) desde cero |
-| [Darkly](#darkly) | Ciberseguridad | CTF de vulnerabilidades web (OWASP Top 10) |
-| [dr-quine](#dr-quine) | Recreación teórica | Programas que imprimen su propio código fuente (quines) |
-| [ft_ping](#ft_ping) | Redes / C | Reimplementación del comando `ping` con sockets raw |
-| [libasm](#libasm) | Ensamblador | Reimplementación de funciones de la libc en x86-64 NASM |
-| [woody-woodpacker](#woody-woodpacker) | Seguridad / ELF | Packer ELF64: cifra el segmento `.text` e inyecta un stub de autodescifrado |
+| [Cybersecurity_Piscine/Arachnida](#arachnida) | Cybersecurity | Web scraper for images + EXIF metadata extractor |
+| [Cybersecurity_Piscine/ft_otp](#ft_otp) | Cybersecurity | TOTP (One-Time Password) generator from scratch |
+| [Darkly](#darkly) | Cybersecurity | CTF with web vulnerabilities (OWASP Top 10) |
+| [dr-quine](#dr-quine) | Theoretical Recreation | Programs that print their own source code (quines) |
+| [ft_ping](#ft_ping) | Networking / C | Reimplementation of `ping` command with raw sockets |
+| [libasm](#libasm) | Assembly | Reimplementation of libc functions in x86-64 NASM |
+| [woody-woodpacker](#woody-woodpacker) | Security / ELF | ELF64 packer: encrypts `.text` segment and injects unpacker stub |
 
 ---
 
 ## Cybersecurity_Piscine/Arachnida
 
-**Ruta:** [`Cybersecurity_Piscine/Arachnida/`](Cybersecurity_Piscine/Arachnida/)
-**Documentación:** [README](Cybersecurity_Piscine/Arachnida/README.md)
+**Path:** [`Cybersecurity_Piscine/Arachnida/`](Cybersecurity_Piscine/Arachnida/)
+**Documentation:** [README](Cybersecurity_Piscine/Arachnida/README.md)
 
-Toolkit de dos herramientas orientadas al análisis web y forense de imágenes:
+Two-tool toolkit focused on web analysis and image forensics:
 
-- **Spider** (`ex00`) — scraper recursivo que descarga imágenes (`.jpg`, `.png`, `.gif`, `.bmp`) a partir de una URL, respetando dominio y profundidad configurables.
-- **Scorpion** (`ex01`) — extractor de metadatos EXIF y atributos de fichero para imágenes locales.
+- **Spider** (`ex00`) — recursive scraper that downloads images (`.jpg`, `.png`, `.gif`, `.bmp`) from a URL, respecting domain and configurable depth.
+- **Scorpion** (`ex01`) — EXIF metadata and file attribute extractor for local images.
 
-**Tecnologías:** Python 3, `requests`, `BeautifulSoup4`, `Pillow`
+**Technologies:** Python 3, `requests`, `BeautifulSoup4`, `Pillow`
 
 ---
 
 ## Cybersecurity_Piscine/ft_otp
 
-**Ruta:** [`Cybersecurity_Piscine/ft_otp/`](Cybersecurity_Piscine/ft_otp/)
-**Documentación:** [README](Cybersecurity_Piscine/ft_otp/README.md)
+**Path:** [`Cybersecurity_Piscine/ft_otp/`](Cybersecurity_Piscine/ft_otp/)
+**Documentation:** [README](Cybersecurity_Piscine/ft_otp/README.md)
 
-Generador de **TOTP** (Time-based One-Time Password) implementado desde cero, basado en el algoritmo HOTP definido en **RFC 4226** y **RFC 6238**.
+**TOTP** (Time-based One-Time Password) generator implemented from scratch, based on the HOTP algorithm defined in **RFC 4226** and **RFC 6238**.
 
-**Operaciones:**
-- **`-g KEYFILE`** — Lee una clave hexadecimal (64+ caracteres) desde un archivo y la guarda encriptada en `ft_otp.key`
-- **`-k [KEYFILE]`** — Genera un código OTP de 6 dígitos a partir de la clave encriptada
+**Operations:**
+- **`-g KEYFILE`** — Reads a hexadecimal key (64+ characters) from a file and saves it encrypted in `ft_otp.key`
+- **`-k [KEYFILE]`** — Generates a 6-digit OTP code from the encrypted key
 
-**Características:**
-- ✅ Implementación desde cero sin librerías TOTP externas
-- ✅ Uso de `hmac-sha1`, `struct`, `time` (solo librerías estándar para la computación)
-- ✅ Encriptación persistente con **Fernet** (AES-128-CBC + HMAC-SHA256)
-- ✅ Gestión segura de claves con persistencia de clave Fernet
-- ✅ Makefile completo con targets de testing y automatización
+**Features:**
+- ✅ Implementation from scratch without external TOTP libraries
+- ✅ Uses `hmac-sha1`, `struct`, `time` (only standard library for computation)
+- ✅ Persistent encryption with **Fernet** (AES-128-CBC + HMAC-SHA256)
+- ✅ Secure key management with Fernet key persistence
+- ✅ Complete Makefile with testing and automation targets
 
-**Uso rápido:**
+**Quick Start:**
 ```bash
-make              # Genera clave hex aleatoria y la encripta
-make run          # Genera TOTP desde la clave guardada
-make test         # Suite completa de validación
+make              # Generates random hex key and encrypts it
+make run          # Generates TOTP from saved key
+make test         # Complete validation suite
 ```
 
-**Tecnologías:** Python 3, `cryptography` (Fernet)
+**Technologies:** Python 3, `cryptography` (Fernet)
 
 ---
 
 ## Darkly
 
-**Ruta:** [`Darkly/`](Darkly/)
-**Documentación:** [README](Darkly/README.md)
+**Path:** [`Darkly/`](Darkly/)
+**Documentation:** [README](Darkly/README.md)
 
-CTF basado en una aplicación web vulnerable intencionalmente. Se exploran y documentan 14 vulnerabilidades del **OWASP Top 10 (2017)**, incluyendo:
+CTF based on an intentionally vulnerable web application. 14 vulnerabilities from **OWASP Top 10 (2017)** are explored and documented, including:
 
 - SQL Injection (x2)
-- Broken Authentication (reset de contraseña, manipulación de cookies, fuerza bruta)
-- Subida insegura de ficheros
+- Broken Authentication (password reset, cookie manipulation, brute force)
+- Insecure file upload
 - Path Traversal
-- Cross-Site Scripting (XSS y via Data URI)
+- Cross-Site Scripting (XSS and via Data URI)
 - Open Redirect, HTTP Header Validation, Security Misconfiguration, Sensitive Data Exposure
 
-Cada vulnerabilidad tiene su flag y su write-up en `<vuln>/resources/README.md`.
+Each vulnerability has its flag and write-up in `<vuln>/resources/README.md`.
 
 ---
 
 ## dr-quine
 
-**Ruta:** [`dr-quine/`](dr-quine/)
-**Documentación:** [C](dr-quine/C/README.md) · [ASM](dr-quine/ASM/README.md) · [Python](dr-quine/Python/README.md)
+**Path:** [`dr-quine/`](dr-quine/)
+**Documentation:** [C](dr-quine/C/README.md) · [ASM](dr-quine/ASM/README.md) · [Python](dr-quine/Python/README.md)
 
-Implementación de **quines** — programas que imprimen su propio código fuente exacto sin leer ningún fichero externo. El proyecto incluye tres variantes de complejidad creciente (`Colleen`, `Grace`, `Sully`), cada una implementada en **C** y en **x86-64 Assembly** (NASM).
+Implementation of **quines** — programs that print their own source code exactly without reading any external file. The project includes three variants of increasing complexity (`Colleen`, `Grace`, `Sully`), each implemented in **C** and in **x86-64 Assembly** (NASM).
 
-Explora los conceptos de auto-referencia, formato posicional de `printf` y meta-programación en ensamblador.
+Explores the concepts of self-reference, positional formatting in `printf`, and meta-programming in assembly.
 
 ---
 
 ## ft_ping
 
-**Ruta:** [`ft_ping/`](ft_ping/)
-**Documentación:** [README](ft_ping/README.md)
+**Path:** [`ft_ping/`](ft_ping/)
+**Documentation:** [README](ft_ping/README.md)
 
-Reimplementación del comando `ping` estándar en C, usando **sockets raw ICMP**. Resuelve nombres de host vía DNS, construye y envía paquetes ICMP Echo Request, y calcula estadísticas de round-trip time (RTT).
+Reimplementation of the standard `ping` command in C, using **raw ICMP sockets**. Resolves hostnames via DNS, constructs and sends ICMP Echo Request packets, and calculates round-trip time (RTT) statistics.
 
-**Tecnologías:** C, sockets raw (`SOCK_RAW`), ICMP, DNS resolution manual
+**Technologies:** C, raw sockets (`SOCK_RAW`), ICMP, manual DNS resolution
 
 ---
 
 ## libasm
 
-**Ruta:** [`libasm/`](libasm/)
-**Documentación:** [README](libasm/README.md)
+**Path:** [`libasm/`](libasm/)
+**Documentation:** [README](libasm/README.md)
 
-Reimplementación de funciones estándar de la libc (`strlen`, `strcpy`, `strcmp`, `write`, `read`, `strdup`) en **x86-64 Assembly** (NASM), siguiendo la ABI System V. Las funciones gestionan correctamente `errno` mediante `__errno_location`.
+Reimplementation of standard libc functions (`strlen`, `strcpy`, `strcmp`, `write`, `read`, `strdup`) in **x86-64 Assembly** (NASM), following System V ABI. Functions correctly handle `errno` using `__errno_location`.
 
-Útil para entender la convención de llamadas de bajo nivel, el uso de syscalls Linux directas y la interoperabilidad entre ensamblador y C.
+Useful for understanding low-level calling conventions, direct Linux syscalls, and assembly-C interoperability.
 
 ---
 
 ## woody-woodpacker
 
-**Ruta:** [`woody-woodpacker/`](woody-woodpacker/)
-**Documentación:** [README](woody-woodpacker/README.md)
+**Path:** [`woody-woodpacker/`](woody-woodpacker/)
+**Documentation:** [README](woody-woodpacker/README.md)
 
-Packer de binarios **ELF64** que cifra el segmento ejecutable (`.text`) con XOR de 16 bytes y le inyecta un stub de autodescifrado usando la técnica de **PT_NOTE hijacking**. Al ejecutar el binario empaquetado (`woody`), éste:
+**ELF64** binary packer that encrypts the executable segment (`.text`) with 16-byte XOR and injects an unpacker stub using the **PT_NOTE hijacking** technique. When executing the packed binary (`woody`), it:
 
-1. Imprime `....WOODY....`
-2. Descifra el `.text` en memoria
-3. Transfiere el control al entry point original
+1. Prints `....WOODY....`
+2. Decrypts the `.text` in memory
+3. Transfers control to the original entry point
 
-El stub está escrito en NASM x86-64 y se inyecta en tiempo de empaquetado modificando la cabecera del programa ELF.
+The stub is written in NASM x86-64 and injected at packing time by modifying the ELF program header.
 
-**Tecnologías:** C, NASM x86-64, formato ELF64, mprotect, XOR cipher
+**Technologies:** C, NASM x86-64, ELF64 format, mprotect, XOR cipher
