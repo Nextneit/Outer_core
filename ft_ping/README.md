@@ -1,26 +1,26 @@
 # ft_ping
 
-Reimplementación del comando `ping` en C usando **sockets RAW** e **ICMP**. Proyecto de la escuela 42.
+C implementation of the `ping` command using **RAW sockets** and **ICMP**. School 42 project.
 
-## Índice
-- [Compilación y Uso](#compilación-y-uso)
-- [Opciones](#opciones)
-- [Arquitectura](#arquitectura)
-- [Conceptos Fundamentales](#conceptos-fundamentales)
-- [Módulos](#módulos)
-- [Ejecutar con Valgrind](#ejecutar-con-valgrind)
+## Index
+- [Compilation and Usage](#compilation-and-usage)
+- [Options](#options)
+- [Architecture](#architecture)
+- [Fundamental Concepts](#fundamental-concepts)
+- [Modules](#modules)
+- [Running with Valgrind](#running-with-valgrind)
 
 ---
 
-## Compilación y Uso
+## Compilation and Usage
 
-### Compilar
+### Compile
 ```bash
 make
 ```
-El Makefile compila el binario y establece automáticamente la capability `cap_net_raw` para permitir sockets RAW sin necesidad de ejecutar como root.
+The Makefile compiles the binary and automatically sets the `cap_net_raw` capability to allow RAW sockets without needing to run as root.
 
-### Uso básico
+### Basic usage
 ```bash
 ./ft_ping google.com
 ./ft_ping 8.8.8.8
@@ -28,47 +28,47 @@ El Makefile compila el binario y establece automáticamente la capability `cap_n
 ./ft_ping -s 128 --ttl 32 -w 5 google.com
 ```
 
-### Limpiar
+### Clean
 ```bash
-make clean     # Elimina objetos
-make fclean    # Elimina objetos y binario
-make re        # Recompila desde cero
-make debug     # Compila con AddressSanitizer, UBSan y flag DEBUG (sin capabilities)
+make clean     # Remove object files
+make fclean    # Remove object files and binary
+make re        # Recompile from scratch
+make debug     # Compile with AddressSanitizer, UBSan and DEBUG flag (no capabilities)
 ```
 
 ---
 
-## Opciones
+## Options
 
-| Opción | Descripción |
+| Option | Description |
 |--------|-------------|
-| `-v` | Modo verbose: muestra paquetes enviados y respuestas no solicitadas |
-| `-n` | No resuelve DNS inverso en la salida; muestra solo la IP |
-| `-s SIZE` | Bytes de datos del payload ICMP (default: 56, máx: 65507) |
-| `--ttl TTL` | Time To Live del paquete IP (rango: 1–255, default: 64) |
-| `-W TIMEOUT` | Tiempo máximo en ms de espera por la respuesta de un paquete (default: 1000) |
-| `-w DEADLINE` | Tiempo total en segundos antes de que ft_ping termine (0 = sin límite) |
-| `-?` / `--help` | Muestra la ayuda |
+| `-v` | Verbose mode: show sent packets and unsolicited responses |
+| `-n` | Do not resolve reverse DNS in output; show IP only |
+| `-s SIZE` | Bytes of ICMP payload data (default: 56, max: 65507) |
+| `--ttl TTL` | Time To Live of the IP packet (range: 1–255, default: 64) |
+| `-W TIMEOUT` | Maximum time in ms to wait for packet response (default: 1000) |
+| `-w DEADLINE` | Total time in seconds before ft_ping terminates (0 = unlimited) |
+| `-?` / `--help` | Show help |
 
 ---
 
-## Arquitectura
+## Architecture
 
 ```
 ft_ping/
 ├── include/
-│   └── ft_ping.h         # Definiciones, structs y prototipos
+│   └── ft_ping.h         # Definitions, structs and prototypes
 └── src/
-    ├── main.c            # Punto de entrada y bucle principal
-    ├── parse.c           # Parseo de argumentos y opciones
-    ├── dns.c             # Resolución de hostname a IP
-    ├── icmp.c            # Construcción y checksum del paquete ICMP
-    ├── network.c         # Socket RAW, envío y recepción de paquetes
-    ├── signals.c         # Manejador de SIGINT (Ctrl+C)
-    └── statistics.c      # Cálculo e impresión de estadísticas finales
+    ├── main.c            # Entry point and main loop
+    ├── parse.c           # Argument and option parsing
+    ├── dns.c             # Hostname to IP resolution
+    ├── icmp.c            # ICMP packet construction and checksum
+    ├── network.c         # RAW socket, packet send and receive
+    ├── signals.c         # SIGINT handler (Ctrl+C)
+    └── statistics.c      # Calculate and print final statistics
 ```
 
-### Structs Principales
+### Main Structs
 
 ```c
 typedef struct s_ping_stats {
@@ -77,37 +77,37 @@ typedef struct s_ping_stats {
     double      min_rtt;
     double      max_rtt;
     double      sum_rtt;
-    double      sum_sq_rtt;   // Para calcular la desviación estándar (mdev)
+    double      sum_sq_rtt;   // To calculate standard deviation (mdev)
 } t_ping_stats;
 
 typedef struct s_ping_config {
-    char            *target;                       // Hostname o IP introducido
-    char            resolved_ip[INET_ADDRSTRLEN];  // IP resuelta
+    char            *target;                       // Hostname or IP entered
+    char            resolved_ip[INET_ADDRSTRLEN];  // Resolved IP
     bool            verbose;                       // Flag -v
     bool            no_dns;                        // Flag -n
-    int             sockfd;                        // File descriptor del socket
-    int             ttl;                           // TTL del paquete IP (--ttl)
-    int             packet_size;                   // Bytes de datos ICMP (-s)
-    int             timeout_ms;                    // Timeout por paquete en ms (-W)
-    int             deadline;                      // Deadline total en segundos (-w)
-    uint16_t        sequence;                      // Número de secuencia ICMP
-    t_ping_stats    stats;                         // Estadísticas de la sesión
-    struct timeval  start_time;                    // Tiempo de inicio
+    int             sockfd;                        // Socket file descriptor
+    int             ttl;                           // TTL of IP packet (--ttl)
+    int             packet_size;                   // Bytes of ICMP data (-s)
+    int             timeout_ms;                    // Per-packet timeout in ms (-W)
+    int             deadline;                      // Total deadline in seconds (-w)
+    uint16_t        sequence;                      // ICMP sequence number
+    t_ping_stats    stats;                         // Session statistics
+    struct timeval  start_time;                    // Start time
 } t_ping_config;
 ```
 
 ---
 
-## Conceptos Fundamentales
+## Fundamental Concepts
 
-### ¿Qué es ICMP?
+### What is ICMP?
 
-El **Internet Control Message Protocol (ICMP)** es un protocolo de red que opera sobre IP. `ping` usa dos tipos de mensajes:
+The **Internet Control Message Protocol (ICMP)** is a network protocol that operates on top of IP. `ping` uses two types of messages:
 
-- **ICMP Echo Request** (`type=8`): el paquete que enviamos
-- **ICMP Echo Reply** (`type=0`): la respuesta del host remoto
+- **ICMP Echo Request** (`type=8`): the packet we send
+- **ICMP Echo Reply** (`type=0`): the response from the remote host
 
-### Estructura del Paquete ICMP
+### ICMP Packet Structure
 
 ```
  0                   1                   2                   3
@@ -121,38 +121,38 @@ El **Internet Control Message Protocol (ICMP)** es un protocolo de red que opera
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ```
 
-- **Identifier**: PID del proceso (`getpid() & 0xFFFF`) para distinguir respuestas propias
-- **Sequence**: número incremental por cada paquete enviado
-- **Data**: bytes de relleno cuyo tamaño se controla con `-s` (default: 56)
+- **Identifier**: Process PID (`getpid() & 0xFFFF`) to distinguish own responses
+- **Sequence**: incremental number for each packet sent
+- **Data**: padding bytes whose size is controlled with `-s` (default: 56)
 
-### Sockets RAW
+### RAW Sockets
 
-A diferencia de TCP/UDP, los **sockets RAW** permiten construir paquetes a nivel IP/ICMP manualmente:
+Unlike TCP/UDP, **RAW sockets** allow manually constructing IP/ICMP packets:
 
 ```c
 sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 ```
 
-Requieren privilegios elevados. Se gestiona vía **Linux capabilities**:
+They require elevated privileges. Managed via **Linux capabilities**:
 ```bash
 sudo setcap cap_net_raw+ep ft_ping
 ```
-Esto evita ejecutar el binario completo como root.
+This avoids running the entire binary as root.
 
-### Cálculo del RTT
+### RTT Calculation
 
-El **Round-Trip Time** se calcula midiendo el tiempo entre `sendto` y `recvfrom`:
+The **Round-Trip Time** is calculated by measuring the time between `sendto` and `recvfrom`:
 
 ```c
 rtt = (recv_time.tv_sec  - send_time->tv_sec)  * 1000.0
     + (recv_time.tv_usec - send_time->tv_usec) / 1000.0;
 ```
 
-El resultado se expresa en **milisegundos**.
+The result is expressed in **milliseconds**.
 
-### Desviación Estándar (mdev)
+### Standard Deviation (mdev)
 
-Al final de la sesión se calcula la desviación media del RTT usando la fórmula de varianza:
+At the end of the session, the mean deviation of RTT is calculated using the variance formula:
 
 ```
 mdev = sqrt( sum(rtt²)/n  -  (sum(rtt)/n)² )
@@ -160,100 +160,100 @@ mdev = sqrt( sum(rtt²)/n  -  (sum(rtt)/n)² )
 
 ---
 
-## Módulos
+## Modules
 
-### `main.c` — Bucle Principal
+### `main.c` — Main Loop
 
-1. Parsea argumentos con `parse_arguments()`
-2. Resuelve el hostname con `resolve_hostname()`
-3. Crea el socket RAW con `create_raw_socket()`
-4. Registra el manejador de señales con `setup_signal_handlers()`
-5. Entra en el bucle: envía ping → recibe respuesta → espera 1 segundo
-6. Respeta el deadline (`-w`) si está definido
+1. Parses arguments with `parse_arguments()`
+2. Resolves hostname with `resolve_hostname()`
+3. Creates RAW socket with `create_raw_socket()`
+4. Registers signal handler with `setup_signal_handlers()`
+5. Enters loop: send ping → receive response → wait 1 second
+6. Respects the deadline (`-w`) if defined
 
-### `parse.c` — Argumentos
+### `parse.c` — Arguments
 
-- Acepta `-v`, `-n`, `-s`, `--ttl`, `-W`, `-w` y `-?`/`--help`
-- Rechaza opciones desconocidas con mensaje de error
-- Valida que se haya indicado exactamente un host
-- Valores por defecto equivalentes a `inetutils-2.0`
+- Accepts `-v`, `-n`, `-s`, `--ttl`, `-W`, `-w` and `-?`/`--help`
+- Rejects unknown options with error message
+- Validates that exactly one host has been specified
+- Default values equivalent to `inetutils-2.0`
 
-### `dns.c` — Resolución DNS
+### `dns.c` — DNS Resolution
 
-Usa `getaddrinfo()` con `AF_INET` para resolver el hostname a IPv4 y almacena la IP en formato cadena con `inet_ntop()`. Libera correctamente el resultado con `freeaddrinfo()`.
+Uses `getaddrinfo()` with `AF_INET` to resolve hostname to IPv4 and stores the IP in string format with `inet_ntop()`. Correctly releases the result with `freeaddrinfo()`.
 
-### `icmp.c` — Paquetes ICMP
+### `icmp.c` — ICMP Packets
 
 **`create_icmp_packet()`**:
-- Inicializa el paquete a cero (`memset`)
-- Rellena cabecera ICMP: type, code, id (PID), sequence
-- Rellena payload con bytes incrementales
-- Calcula y asigna el checksum
+- Initializes packet to zero (`memset`)
+- Fills ICMP header: type, code, id (PID), sequence
+- Fills payload with incremental bytes
+- Calculates and assigns checksum
 
 **`calculate_checksum()`**:
-- Algoritmo de complemento a uno sobre palabras de 16 bits
-- Estándar RFC 792 para verificar integridad del paquete
+- One's complement algorithm on 16-bit words
+- RFC 792 standard to verify packet integrity
 
-### `network.c` — Red
+### `network.c` — Network
 
 **`create_raw_socket()`**:
-- Crea socket `SOCK_RAW`/`IPPROTO_ICMP`
-- Configura TTL vía `setsockopt(IP_TTL)` (default 64, sobreescribible con `--ttl`)
-- Configura timeout de recepción vía `setsockopt(SO_RCVTIMEO)` (controlado por `-W`)
+- Creates `SOCK_RAW`/`IPPROTO_ICMP` socket
+- Configures TTL via `setsockopt(IP_TTL)` (default 64, overridable with `--ttl`)
+- Configures receive timeout via `setsockopt(SO_RCVTIMEO)` (controlled by `-W`)
 
 **`send_ping()`**:
-- Construye dirección de destino con `inet_pton`
-- Llama a `create_icmp_packet()` y envía con `sendto`
-- Incrementa `packets_sent` y `sequence`
+- Builds destination address with `inet_pton`
+- Calls `create_icmp_packet()` and sends with `sendto`
+- Increments `packets_sent` and `sequence`
 
 **`receive_ping()`**:
-- Lee respuesta con `recvfrom`
-- Salta la cabecera IP (`ip_hl << 2`) para acceder al ICMP
-- Verifica `type == ICMP_ECHOREPLY` e `id == PID`
-- Calcula RTT y actualiza estadísticas (min, max, sum, sum²)
-- Imprime: `N bytes from IP: icmp_seq=X ttl=Y time=Z ms`
+- Reads response with `recvfrom`
+- Skips IP header (`ip_hl << 2`) to access ICMP
+- Verifies `type == ICMP_ECHOREPLY` and `id == PID`
+- Calculates RTT and updates statistics (min, max, sum, sum²)
+- Prints: `N bytes from IP: icmp_seq=X ttl=Y time=Z ms`
 
-### `signals.c` — Señales
+### `signals.c` — Signals
 
 **`setup_signal_handlers()`**:
-- Guarda un puntero global a `t_ping_config`
-- Registra `handle_sigint` para `SIGINT` (Ctrl+C)
+- Saves a global pointer to `t_ping_config`
+- Registers `handle_sigint` for `SIGINT` (Ctrl+C)
 
 **`handle_sigint()`**:
-- Llama a `print_statistics()` antes de salir
-- Cierra el socket y libera la memoria del config
+- Calls `print_statistics()` before exiting
+- Closes socket and frees config memory
 
-### `statistics.c` — Estadísticas
+### `statistics.c` — Statistics
 
 **`print_statistics()`**:
-- Calcula el tiempo total transcurrido desde `start_time`
-- Imprime el porcentaje de pérdida de paquetes
-- Si se recibió al menos una respuesta, imprime `rtt min/avg/max/mdev`
+- Calculates total elapsed time since `start_time`
+- Prints packet loss percentage
+- If at least one response was received, prints `rtt min/avg/max/mdev`
 
 ---
 
-## Ejecutar con Valgrind
+## Running with Valgrind
 
-Los sockets RAW requieren la capability `cap_net_raw`. Valgrind **no puede** heredar capabilities de un binario con `setcap`, por lo que el flujo correcto es:
+RAW sockets require the `cap_net_raw` capability. Valgrind **cannot** inherit capabilities from a binary with `setcap`, so the correct workflow is:
 
-### 1. Quitar las capabilities del binario
+### 1. Remove capabilities from the binary
 ```bash
 /sbin/setcap -r ./ft_ping
 ```
 
-### 2. Ejecutar Valgrind con privilegios de root
+### 2. Run Valgrind with root privileges
 ```bash
-# Leak check básico
+# Basic leak check
 sudo valgrind --leak-check=full ./ft_ping -v localhost
 
-# Leak check completo con seguimiento de orígenes
+# Full leak check with origin tracking
 sudo valgrind \
   --leak-check=full \
   --show-leak-kinds=all \
   --track-origins=yes \
   ./ft_ping -v localhost
 
-# Con deadline para terminar automáticamente en N segundos
+# With deadline to auto-terminate in N seconds
 sudo valgrind \
   --leak-check=full \
   --show-leak-kinds=all \
@@ -261,9 +261,9 @@ sudo valgrind \
   ./ft_ping -v -w 3 localhost
 ```
 
-### 3. Restaurar las capabilities
+### 3. Restore capabilities
 ```bash
 sudo setcap cap_net_raw+ep ./ft_ping
 ```
 
-> **Nota**: La memoria clasificada como `still reachable` en los resultados de Valgrind es normal y corresponde a buffers internos de `getaddrinfo()` de la libc que se liberan al finalizar el proceso.
+> **Note**: Memory marked as `still reachable` in Valgrind results is normal and corresponds to internal buffers from `getaddrinfo()` in libc that are freed when the process exits.
