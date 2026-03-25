@@ -9,6 +9,7 @@ Colección de proyectos de bajo nivel, seguridad y sistemas. Cada carpeta es un 
 | Proyecto | Área | Descripción breve |
 |---|---|---|
 | [Cybersecurity_Piscine/Arachnida](#arachnida) | Ciberseguridad | Web scraper de imágenes + extractor de metadatos EXIF |
+| [Cybersecurity_Piscine/ft_otp](#ft_otp) | Ciberseguridad | Generador TOTP (One-Time Password) desde cero |
 | [Darkly](#darkly) | Ciberseguridad | CTF de vulnerabilidades web (OWASP Top 10) |
 | [dr-quine](#dr-quine) | Recreación teórica | Programas que imprimen su propio código fuente (quines) |
 | [ft_ping](#ft_ping) | Redes / C | Reimplementación del comando `ping` con sockets raw |
@@ -28,6 +29,35 @@ Toolkit de dos herramientas orientadas al análisis web y forense de imágenes:
 - **Scorpion** (`ex01`) — extractor de metadatos EXIF y atributos de fichero para imágenes locales.
 
 **Tecnologías:** Python 3, `requests`, `BeautifulSoup4`, `Pillow`
+
+---
+
+## Cybersecurity_Piscine/ft_otp
+
+**Ruta:** [`Cybersecurity_Piscine/ft_otp/`](Cybersecurity_Piscine/ft_otp/)
+**Documentación:** [README](Cybersecurity_Piscine/ft_otp/README.md)
+
+Generador de **TOTP** (Time-based One-Time Password) implementado desde cero, basado en el algoritmo HOTP definido en **RFC 4226** y **RFC 6238**.
+
+**Operaciones:**
+- **`-g KEYFILE`** — Lee una clave hexadecimal (64+ caracteres) desde un archivo y la guarda encriptada en `ft_otp.key`
+- **`-k [KEYFILE]`** — Genera un código OTP de 6 dígitos a partir de la clave encriptada
+
+**Características:**
+- ✅ Implementación desde cero sin librerías TOTP externas
+- ✅ Uso de `hmac-sha1`, `struct`, `time` (solo librerías estándar para la computación)
+- ✅ Encriptación persistente con **Fernet** (AES-128-CBC + HMAC-SHA256)
+- ✅ Gestión segura de claves con persistencia de clave Fernet
+- ✅ Makefile completo con targets de testing y automatización
+
+**Uso rápido:**
+```bash
+make              # Genera clave hex aleatoria y la encripta
+make run          # Genera TOTP desde la clave guardada
+make test         # Suite completa de validación
+```
+
+**Tecnologías:** Python 3, `cryptography` (Fernet)
 
 ---
 
