@@ -1,89 +1,89 @@
-# Dr-Quine - Implementación en C
+# Dr-Quine - C Implementation
 
-Este directorio contiene la implementación en C del proyecto **dr-quine** de la escuela 42. Un **quine** es un programa que imprime su propio código fuente sin leer ningún archivo.
+This directory contains the C implementation of the **dr-quine** project from School 42. A **quine** is a program that prints its own source code without reading any external file.
 
-## Índice
-- [Compilación y Ejecución](#compilación-y-ejecución)
-- [Conceptos Fundamentales](#conceptos-fundamentales)
-- [Colleen.c - Quine Básico](#colleenc---quine-básico)
-- [Grace.c - Quine con Macros](#gracec---quine-con-macros)
-- [Sully.c - Quine Recursivo](#sullyc---quine-recursivo)
-- [Técnicas Avanzadas](#técnicas-avanzadas)
+## Index
+- [Compilation and Execution](#compilation-and-execution)
+- [Fundamental Concepts](#fundamental-concepts)
+- [Colleen.c - Basic Quine](#colleenc---basic-quine)
+- [Grace.c - Quine with Macros](#gracec---quine-with-macros)
+- [Sully.c - Recursive Quine](#sullyc---recursive-quine)
+- [Advanced Techniques](#advanced-techniques)
 
 ---
 
-## Compilación y Ejecución
+## Compilation and Execution
 
-### Compilar todos los programas
+### Compile all programs
 ```bash
 make
 ```
 
-### Ejecutar tests
+### Run tests
 ```bash
-make test              # Ejecuta todos los tests
-make test_colleen      # Test individual de Colleen
-make test_grace        # Test individual de Grace
-make test_sully        # Test individual de Sully
+make test              # Run all tests
+make test_colleen      # Colleen individual test
+make test_grace        # Grace individual test
+make test_sully        # Sully individual test
 ```
 
-### Limpiar archivos generados
+### Clean generated files
 ```bash
-make clean    # Limpia binarios
-make fclean   # Limpieza completa
+make clean    # Clean binaries
+make fclean   # Complete cleanup
 ```
 
 ---
 
-## Conceptos Fundamentales
+## Fundamental Concepts
 
-### ¿Qué es un Quine?
+### What is a Quine?
 
-Un quine es un programa que produce su propio código fuente como salida, **sin**:
-- Leer archivos (no `fopen`, `read`, etc.)
-- Usar `argv[0]` o información del sistema
-- Usar trucos del compilador o depurador
-- Hacer trampa de ninguna forma
+A quine is a program that produces its own source code as output, **without**:
+- Reading files (no `fopen`, `read`, etc.)
+- Using `argv[0]` or system information
+- Using compiler or debugger tricks
+- Cheating in any form
 
-### Restricciones del Proyecto
+### Project Constraints
 
-Cada programa debe cumplir:
-- **Colleen**: 2 comentarios (uno externo, uno interno) + 1 función auxiliar
-- **Grace**: 1 comentario + exactamente 3 macros (#define) + NO main explícito
-- **Sully**: Crear exactamente 13 archivos (Sully + 6 archivos .c + 6 binarios)
+Each program must satisfy:
+- **Colleen**: 2 comments (one external, one internal) + 1 helper function
+- **Grace**: 1 comment + exactly 3 macros (#define) + NO explicit main
+- **Sully**: Create exactly 13 files (Sully + 6 .c files + 6 binaries)
 
-### Técnica Clave: Printf con Argumentos Posicionales
+### Key Technique: Printf with Positional Arguments
 
-La técnica fundamental es usar `printf` con **argumentos posicionales**:
+The fundamental technique is using `printf` with **positional arguments**:
 
 ```c
 printf("%1$c %2$s %1$c", 10, "hello");
-// Resultado: "\n hello \n"
+// Output: "\n hello \n"
 ```
 
-**Ventajas**:
-- `%N$X` permite referirse al argumento N-ésimo
-- Puedes reutilizar el mismo argumento múltiples veces
-- Esencial para la auto-referencia en quines
+**Advantages**:
+- `%N$X` allows referring to the N-th argument
+- You can reuse the same argument multiple times
+- Essential for self-reference in quines
 
-### Valores Clave
+### Key Values
 
-| Valor | Carácter | Uso |
-|-------|----------|-----|
-| `10` | `\n` | Newline (salto de línea) |
-| `9` | `\t` | Tab (tabulación) |
-| `34` | `"` | Comillas dobles |
+| Value | Character | Usage |
+|-------|-----------|-------|
+| `10` | `\n` | Newline |
+| `9` | `\t` | Tab |
+| `34` | `"` | Double quote |
 
-Estos valores permiten evitar caracteres de escape en el string codificado.
+These values allow avoiding escape characters in the encoded string.
 
 ---
 
-## Colleen.c - Quine Básico
+## Colleen.c - Basic Quine
 
-### Descripción
-Imprime su propio código fuente a **stdout** usando una función auxiliar.
+### Description
+Prints its own source code to **stdout** using a helper function.
 
-### Código Completo
+### Complete Code
 ```c
 /*
 	Outer comment
@@ -104,48 +104,48 @@ int main(){
 }
 ```
 
-### Análisis Detallado
+### Detailed Analysis
 
-#### Estructura
-- **Comentario externo**: `/* Outer comment */`
-- **Comentario en función**: `// Inner comment in function`
-- **Comentario en main**: `/* Inner comment in main */`
-- **Función auxiliar**: `ft()` que realiza la impresión
+#### Structure
+- **External comment**: `/* Outer comment */`
+- **Function comment**: `// Inner comment in function`
+- **Main comment**: `/* Inner comment in main */`
+- **Helper function**: `ft()` that performs the printing
 
-#### El String `s`
+#### The String `s`
 
-El string `s` contiene **todo el código del programa** codificado con placeholders:
+The string `s` contains **the entire program code** encoded with placeholders:
 
 ```c
 char*s="/*%1$c%2$cOuter comment%1$c*/...";
 ```
 
 **Placeholders**:
-- `%1$c` → argumento 1 → `10` → newline (`\n`)
-- `%2$c` → argumento 2 → `9` → tab (`\t`)
-- `%3$c` → argumento 3 → `34` → comilla doble (`"`)
-- `%4$s` → argumento 4 → `s` → el contenido del string s (auto-referencia)
+- `%1$c` → argument 1 → `10` → newline (`\n`)
+- `%2$c` → argument 2 → `9` → tab (`\t`)
+- `%3$c` → argument 3 → `34` → double quote (`"`)
+- `%4$s` → argument 4 → `s` → string s content (self-reference)
 
-#### Funcionamiento Paso a Paso
+#### Step-by-Step Execution
 
-1. **Definición del string**: `s` contiene el código con placeholders
-2. **Llamada a printf**:
+1. **String definition**: `s` contains the code with placeholders
+2. **Printf call**:
    ```c
    printf(s,10,9,34,s);
    ```
-   - `s` es el formato
-   - `10` sustituye `%1$c` (newlines)
-   - `9` sustituye `%2$c` (tabs)
-   - `34` sustituye `%3$c` (comillas)
-   - `s` sustituye `%4$s` (el string completo)
+   - `s` is the format string
+   - `10` replaces `%1$c` (newlines)
+   - `9` replaces `%2$c` (tabs)
+   - `34` replaces `%3$c` (quotes)
+   - `s` replaces `%4$s` (entire string)
 
-3. **Auto-referencia**: Cuando printf ve `%4$s`, inserta el contenido de `s`, que incluye la definición `char*s="..."`
+3. **Self-reference**: When printf sees `%4$s`, it inserts the content of `s`, which includes the definition `char*s="..."`
 
-4. **Resultado**: El código completo con su formato original
+4. **Result**: The complete code with its original format
 
-### Ejemplo de Expansión
+### Expansion Example
 
-Fragmento simplificado:
+Simplified fragment:
 ```c
 "char*s=%3$c%4$s%3$c;"
 ```
@@ -155,19 +155,17 @@ Con argumentos `(10,9,34,s)` se expande a:
 char*s="[contenido de s]";
 ```
 
-### Requisitos Cumplidos
-- ✅ 2 comentarios (outer e inner)
-- ✅ 1 función auxiliar (`ft()`)
-- ✅ Código completo reproducido exactamente
+### Requirements Met
+- ✅ 2 comments (outer and inner)
+- ✅ 1 helper function (`ft()`)
+- ✅ Complete code reproduced exactly
 
----
+## Grace.c - Quine with Macros
 
-## Grace.c - Quine con Macros
+### Description
+Writes its source code to **Grace_kid.c** using **only macros** (without visible main function).
 
-### Descripción
-Escribe su código fuente en **Grace_kid.c** usando **solo macros** (sin función main visible).
-
-### Código Completo
+### Complete Code
 ```c
 /*Comment*/
 #include<stdio.h>
@@ -178,86 +176,86 @@ Escribe su código fuente en **Grace_kid.c** usando **solo macros** (sin funció
 M
 ```
 
-### Análisis de las Macros
+### Analysis of Macros
 
-#### Macro S - String del Código
+#### Macro S - Code String
 ```c
 #define S "/*Comment*/%1$c#include<stdio.h>%1$c..."
 ```
-- Contiene todo el código del programa codificado
-- Usa `%1$c` para newline (10) y `%2$c` para comilla (34)
-- `%3$s` se auto-referencia al macro S mismo
+- Contains the entire program code encoded
+- Uses `%1$c` for newline (10) and `%2$c` for quote (34)
+- `%3$s` self-references to macro S itself
 
-#### Macro F - Funcionalidad
+#### Macro F - Functionality
 ```c
 #define F {FILE*f=fopen("Grace_kid.c","w");fprintf(f,S,10,34,S);fclose(f);}
 ```
-Esta macro:
-1. Abre el archivo `Grace_kid.c` en modo escritura
-2. Escribe el código usando `fprintf` con el string `S`
-3. Cierra el archivo
+This macro:
+1. Opens the file `Grace_kid.c` in write mode
+2. Writes the code using `fprintf` with string `S`
+3. Closes the file
 
-Los argumentos de fprintf:
-- `S` → formato (el string con placeholders)
+The fprintf arguments:
+- `S` → format (the string with placeholders)
 - `10` → `%1$c` (newline)
-- `34` → `%2$c` (comillas dobles)
-- `S` → `%3$s` (el contenido del macro S)
+- `34` → `%2$c` (double quotes)
+- `S` → `%3$s` (the macro S content)
 
-#### Macro M - Main Implícito
+#### Macro M - Implicit Main
 ```c
 #define M int main(){F return 0;}
 ```
-- Define la función `main` como macro
-- Ejecuta el macro `F` (que escribe el archivo)
-- Retorna 0
+- Defines the `main` function as a macro
+- Executes macro `F` (which writes the file)
+- Returns 0
 
-#### Invocación
+#### Invocation
 ```c
 M
 ```
-Esta única línea:
-1. Expande el macro `M`
-2. Que crea `int main()`
-3. Que ejecuta `F`
-4. Que escribe el quine en `Grace_kid.c`
+This single line:
+1. Expands macro `M`
+2. Which creates `int main()`
+3. Which executes `F`
+4. Which writes the quine to `Grace_kid.c`
 
-### Flujo de Ejecución
+### Execution Flow
 
 ```
-Compilador ve: M
+Compiler sees: M
               ↓
-Expande a: int main(){F return 0;}
+Expands to: int main(){F return 0;}
               ↓
-Expande F: int main(){{FILE*f=fopen("Grace_kid.c","w");fprintf(f,S,10,34,S);fclose(f);} return 0;}
+Expands F: int main(){{FILE*f=fopen("Grace_kid.c","w");fprintf(f,S,10,34,S);fclose(f);} return 0;}
               ↓
-Ejecuta: abre Grace_kid.c
+Executes: opens Grace_kid.c
               ↓
-fprintf usa S como formato con args (10,34,S)
+fprintf uses S as format with args (10,34,S)
               ↓
-Grace_kid.c contiene el código completo
+Grace_kid.c contains the complete code
 ```
 
-### Técnica Única: Main Oculto
+### Unique Technique: Hidden Main
 
-Grace **no tiene un `int main()` visible** en el código fuente. Todo se hace mediante macros:
-- `#define M` crea el main
-- `M` al final lo invoca
-- Esto cumple con el requisito de usar solo macros
+Grace **does not have a visible `int main()`** in the source code. Everything is done through macros:
+- `#define M` creates the main
+- `M` at the end invokes it
+- This satisfies the requirement of using only macros
 
-### Requisitos Cumplidos
-- ✅ 1 comentario (`/*Comment*/`)
-- ✅ Exactamente 3 macros (#define S, F, M)
-- ✅ No hay función main visible (está en un macro)
-- ✅ Grace_kid.c es idéntico a Grace.c
+### Requirements Met
+- ✅ 1 comment (`/*Comment*/`)
+- ✅ Exactly 3 macros (#define S, F, M)
+- ✅ No visible main function (it's in a macro)
+- ✅ Grace_kid.c is identical to Grace.c
 
 ---
 
-## Sully.c - Quine Recursivo
+## Sully.c - Recursive Quine
 
-### Descripción
-Genera una cadena de quines que se auto-replican, compilan y ejecutan, decrementando un contador en cada generación.
+### Description
+Generates a chain of quines that self-replicate, compile and execute, decrementing a counter with each generation.
 
-### Código Completo
+### Complete Code
 ```c
 #include<stdio.h>
 #include<stdlib.h>
@@ -281,27 +279,27 @@ int main(){
 }
 ```
 
-### Análisis Línea por Línea
+### Line-by-Line Analysis
 
-#### Variables Principales
+#### Main Variables
 ```c
-int i=5;                    // Contador inicial
-char*s="...";               // String con todo el código
-char f[32],c[128];          // Buffers para filename y comando
+int i=5;                    // Initial counter
+char*s="...";               // String with all the code
+char f[32],c[128];          // Buffers for filename and command
 ```
 
-#### Fase 1: Validación
+#### Phase 1: Validation
 ```c
 if(i<0)
 	return 0;
 ```
-Si el contador es negativo, terminar (aunque con `i=5` inicial esto nunca pasa en la primera ejecución).
+If the counter is negative, exit (although with initial `i=5` this never happens on first run).
 
-#### Fase 2: Generación del Archivo
+#### Phase 2: File Generation
 ```c
 sprintf(f,"Sully_%d.c",i);
 ```
-Crea el nombre del archivo: `Sully_5.c`, `Sully_4.c`, etc.
+Creates the filename: `Sully_5.c`, `Sully_4.c`, etc.
 
 ```c
 FILE*fp=fopen(f,"w");
@@ -309,18 +307,18 @@ fprintf(fp,s,10,9,i-1,34,s);
 fclose(fp);
 ```
 
-**¡CLAVE!**: Los argumentos de fprintf son:
+**KEY**: The fprintf arguments are:
 - `fp` → file pointer
-- `s` → formato con placeholders
+- `s` → format with placeholders
 - `10` → `%1$c` (newline)
 - `9` → `%2$c` (tab)
-- `i-1` → `%3$d` (**contador decrementado**)
-- `34` → `%4$c` (comillas)
-- `s` → `%5$s` (el string completo)
+- `i-1` → `%3$d` (**decremented counter**)
+- `34` → `%4$c` (quotes)
+- `s` → `%5$s` (the complete string)
 
-El `i-1` es crucial: escribe el código con el contador reducido.
+The `i-1` is crucial: it writes the code with a reduced counter.
 
-#### Fase 3: Compilación y Ejecución (Recursión)
+#### Phase 3: Compilation and Execution (Recursion)
 ```c
 if(i>0){
 	sprintf(c,"gcc -Wall -Wextra -Werror Sully_%d.c -o Sully_%d && ./Sully_%d",i,i,i);
@@ -328,247 +326,245 @@ if(i>0){
 }
 ```
 
-Si `i > 0`:
-1. Construye el comando de compilación
-2. Compila `Sully_X.c` → `Sully_X`
-3. Ejecuta `./Sully_X` (que tiene `i` decrementado)
+If `i > 0`:
+1. Builds the compilation command
+2. Compiles `Sully_X.c` → `Sully_X`
+3. Executes `./Sully_X` (which has `i` decremented)
 
-### Cadena de Ejecución Completa
+### Complete Execution Chain
 
 ```
 Sully (i=5)
-  ├─> crea Sully_5.c (con i=4)
-  ├─> compila Sully_5.c → Sully_5
-  └─> ejecuta ./Sully_5
-        ├─> crea Sully_4.c (con i=3)
-        ├─> compila Sully_4.c → Sully_4
-        └─> ejecuta ./Sully_4
-              ├─> crea Sully_3.c (con i=2)
-              ├─> compila Sully_3.c → Sully_3
-              └─> ejecuta ./Sully_3
-                    ├─> crea Sully_2.c (con i=1)
-                    ├─> compila Sully_2.c → Sully_2
-                    └─> ejecuta ./Sully_2
-                          ├─> crea Sully_1.c (con i=0)
-                          ├─> compila Sully_1.c → Sully_1
-                          └─> ejecuta ./Sully_1
-                                ├─> crea Sully_0.c (con i=-1)
-                                └─> NO compila (i=0, salta el if)
+  ├─> creates Sully_5.c (with i=4)
+  ├─> compiles Sully_5.c → Sully_5
+  └─> executes ./Sully_5
+        ├─> creates Sully_4.c (with i=3)
+        ├─> compiles Sully_4.c → Sully_4
+        └─> executes ./Sully_4
+              ├─> creates Sully_3.c (with i=2)
+              ├─> compiles Sully_3.c → Sully_3
+              └─> executes ./Sully_3
+                    ├─> creates Sully_2.c (with i=1)
+                    ├─> compiles Sully_2.c → Sully_2
+                    └─> executes ./Sully_2
+                          ├─> creates Sully_1.c (with i=0)
+                          ├─> compiles Sully_1.c → Sully_1
+                          └─> executes ./Sully_1
+                                ├─> creates Sully_0.c (with i=-1)
+                                └─> does NOT compile (i=0, skips if)
 ```
 
-### Archivos Generados
+### Generated Files
 
-Total: **13 archivos**
+Total: **13 files**
 
-| Archivo | Descripción | Contador i |
-|---------|-------------|------------|
-| `Sully` | Binario original | `i=5` |
-| `Sully.c` | Código fuente original | `i=5` |
-| `Sully_5.c` | Generado por Sully | `i=4` |
-| `Sully_5` | Binario compilado | `i=4` |
-| `Sully_4.c` | Generado por Sully_5 | `i=3` |
-| `Sully_4` | Binario compilado | `i=3` |
-| `Sully_3.c` | Generado por Sully_4 | `i=2` |
-| `Sully_3` | Binario compilado | `i=2` |
-| `Sully_2.c` | Generado por Sully_3 | `i=1` |
-| `Sully_2` | Binario compilado | `i=1` |
-| `Sully_1.c` | Generado por Sully_2 | `i=0` |
-| `Sully_1` | Binario compilado | `i=0` |
-| `Sully_0.c` | Generado por Sully_1 | `i=-1` |
+| File | Description | Counter i |
+|------|-------------|-----------|
+| `Sully` | Original binary | `i=5` |
+| `Sully.c` | Original source code | `i=5` |
+| `Sully_5.c` | Generated by Sully | `i=4` |
+| `Sully_5` | Compiled binary | `i=4` |
+| `Sully_4.c` | Generated by Sully_5 | `i=3` |
+| `Sully_4` | Compiled binary | `i=3` |
+| `Sully_3.c` | Generated by Sully_4 | `i=2` |
+| `Sully_3` | Compiled binary | `i=2` |
+| `Sully_2.c` | Generated by Sully_3 | `i=1` |
+| `Sully_2` | Compiled binary | `i=1` |
+| `Sully_1.c` | Generated by Sully_2 | `i=0` |
+| `Sully_1` | Compiled binary | `i=0` |
+| `Sully_0.c` | Generated by Sully_1 | `i=-1` |
 
-**Nota**: `Sully_0.c` se crea pero NO se compila porque el `if(i>0)` lo impide.
+**Note**: `Sully_0.c` is created but NOT compiled because the `if(i>0)` prevents it.
 
-### Diferencias Entre Generaciones
+### Differences Between Generations
 
-Cada archivo `Sully_X.c` es **casi idéntico** al anterior, solo cambia:
+Each file `Sully_X.c` is **almost identical** to the previous one, only changes:
 
 ```c
-// En Sully_5.c
+// In Sully_5.c
 int i=4;
 
-// En Sully_4.c
+// In Sully_4.c
 int i=3;
 
 // etc.
 ```
 
-### Por Qué se Detiene
+### Why It Stops
 
-1. `Sully_1` tiene `i=0`
-2. Ejecuta `fprintf(fp,s,10,9,i-1,34,s)` → crea `Sully_0.c` con `i=-1`
-3. El `if(i>0)` es **false** → no compila ni ejecuta
-4. Retorna 0 → fin de la recursión
+1. `Sully_1` has `i=0`
+2. Executes `fprintf(fp,s,10,9,i-1,34,s)` → creates `Sully_0.c` with `i=-1`
+3. The `if(i>0)` is **false** → does not compile or execute
+4. Returns 0 → end of recursion
 
-### Requisitos Cumplidos
-- ✅ Contador inicial `i=5`
-- ✅ Decrementa en cada generación
-- ✅ Se detiene cuando `i=0` (no ejecuta `Sully_0`)
-- ✅ Genera exactamente 13 archivos
+### Requirements Met
+- ✅ Initial counter `i=5`
+- ✅ Decrements in each generation
+- ✅ Stops when `i=0` (does not execute `Sully_0`)
+- ✅ Generates exactly 13 files
 
----
+## Advanced Techniques
 
-## Técnicas Avanzadas
+### 1. Positional Printf Formatting
 
-### 1. Formato Posicional de Printf
-
-El formato `%N$X` permite:
+The `%N$X` format allows:
 ```c
-printf("%2$s dice %1$d veces", 3, "hola");
-// Resultado: "hola dice 3 veces"
+printf("%2$s says %1$d times", 3, "hello");
+// Result: "hello says 3 times"
 ```
 
-**Para quines**:
+**For quines**:
 ```c
 printf("%1$c%2$c%3$c%1$c", 10, 9, 65);
-// Resultado: "\n\tA\n"
+// Result: "\n\tA\n"
 ```
 
-Reutilizar argumentos es esencial para la auto-referencia.
+Reusing arguments is essential for self-reference.
 
-### 2. String con Doble Escape
+### 2. String with Double Escaping
 
-En el string `s`, algunos caracteres necesitan escape especial:
+In string `s`, some characters need special escaping:
 
-- `%%` → Un solo `%` literal
-- `%1$c` → Placeholder que será sustituido
-- `Sully_%%d.c` → En la salida será `Sully_%d.c`
+- `%%` → Single literal `%`
+- `%1$c` → Placeholder to be substituted
+- `Sully_%%d.c` → In output becomes `Sully_%d.c`
 
-Ejemplo:
+Example:
 ```c
 char*s="sprintf(f,%4$cSully_%%d.c%4$c,i);";
 ```
 
-Cuando se imprime con argumento `34` (comilla):
+When printed with argument `34` (quote):
 ```c
 sprintf(f,"Sully_%d.c",i);
 ```
 
-### 3. Auto-referencia Cuidadosa
+### 3. Careful Self-Reference
 
-El truco está en que `s` se pasa a sí mismo como argumento:
+The trick is that `s` passes itself as an argument:
 
 ```c
 printf(s, ..., s);
       ↑       ↑
-   formato  dato
+   format   data
 ```
 
-Dentro de `s`, hay un `%4$s` (o `%5$s` en Sully) que recibe el contenido de `s`.
+Inside `s`, there's a `%4$s` (or `%5$s` in Sully) that receives the content of `s`.
 
-### 4. Buffer para System()
+### 4. Buffer for System()
 
-En Sully, el comando es complejo:
+In Sully, the command is complex:
 ```c
 sprintf(c,"gcc -Wall -Wextra -Werror Sully_%d.c -o Sully_%d && ./Sully_%d",i,i,i);
 ```
 
-Esto construye:
+This builds:
 ```bash
 gcc -Wall -Wextra -Werror Sully_5.c -o Sully_5 && ./Sully_5
 ```
 
-El `&&` asegura que solo se ejecute si la compilación tiene éxito.
+The `&&` ensures execution only if compilation succeeds.
 
-### 5. Gestión de Archivos
+### 5. File Management
 
-Patrón común:
+Common pattern:
 ```c
 FILE*fp=fopen(filename,"w");
 fprintf(fp, format, ...);
 fclose(fp);
 ```
 
-**Importante**: Siempre cerrar con `fclose()` para garantizar que el buffer se escriba al disco antes de que `system()` intente compilar el archivo.
+**Important**: Always close with `fclose()` to ensure the buffer is written to disk before `system()` tries to compile the file.
 
 ---
 
-## Comparación con la Versión ASM
+## Comparison with Assembly Version
 
-| Aspecto | C | Assembly |
-|---------|---|----------|
-| **Sintaxis** | Más legible | Más verbosa |
-| **Argumentos** | `printf(s,10,9,34,s)` | Registros `rdi,rsi,rdx,rcx,r8` |
-| **String** | Literal con escapes | `db` en `.data` section |
-| **Stack** | Manejado automáticamente | Manual con `push`/`pop` |
-| **Compilación** | `gcc` | `nasm` + `gcc` |
-| **Complejidad** | Media | Alta |
+| Aspect | C | Assembly |
+|--------|---|----------|
+| **Syntax** | More readable | More verbose |
+| **Arguments** | `printf(s,10,9,34,s)` | Registers `rdi,rsi,rdx,rcx,r8` |
+| **String** | Literal with escapes | `db` in `.data` section |
+| **Stack** | Handled automatically | Manual with `push`/`pop` |
+| **Compilation** | `gcc` | `nasm` + `gcc` |
+| **Complexity** | Medium | High |
 
 ---
 
-## Debugging de Quines
+## Debugging Quines
 
-### Verificar Colleen
+### Verify Colleen
 ```bash
 ./Colleen > output.c
 diff Colleen.c output.c
-# No debe haber diferencias
+# No differences should exist
 ```
 
-### Verificar Grace
+### Verify Grace
 ```bash
 ./Grace
 diff Grace.c Grace_kid.c
-# No debe haber diferencias
+# No differences should exist
 ```
 
-### Verificar Sully
+### Verify Sully
 ```bash
 ./Sully
 ls -1 Sully*
-# Debe listar 13 archivos
+# Should list 13 files
 
-# Verificar contenido
+# Verify content
 diff <(cat Sully.c | sed 's/int i=5/int i=4/') Sully_5.c
-# No debe haber diferencias excepto el contador
+# No differences except the counter
 ```
 
-### Errores Comunes
+### Common Errors
 
-1. **Diferencias en whitespace**:
-   - Verificar tabs vs espacios
-   - Verificar newlines al final del archivo
+1. **Whitespace differences**:
+   - Check tabs vs spaces
+   - Check newlines at end of file
 
-2. **Problemas con comillas**:
-   - Usar `%3$c` con argumento `34`
-   - No intentar escapar con `\"`
+2. **Quote issues**:
+   - Use `%3$c` with argument `34`
+   - Don't try to escape with `\"`
 
-3. **Argumentos posicionales**:
-   - Verificar que `%N$X` usa el índice correcto
-   - Recordar que son 1-indexed (no 0-indexed)
+3. **Positional arguments**:
+   - Verify `%N$X` uses correct index
+   - Remember they are 1-indexed (not 0-indexed)
 
-4. **Buffer overflow en Sully**:
-   - `char f[32]` debe ser suficiente para `Sully_X.c`
-   - `char c[128]` debe ser suficiente para el comando completo
-
----
-
-## Conceptos Teóricos
-
-### Teorema de Recursión de Kleene
-
-Los quines son posibles gracias al **teorema de recursión de Kleene**, que dice:
-> Para cualquier función computable f, existe un programa p tal que p produce f(p) como salida.
-
-En un quine, f es la función identidad, por lo que p produce p.
-
-### La Paradoja del Quine
-
-¿Cómo puede un programa describirse a sí mismo sin leerse?
-
-**Respuesta**: Usando una estructura de datos que se describe a sí misma en dos niveles:
-1. **Código**: "Imprime X entre comillas, luego X"
-2. **Dato X**: "Imprime X entre comillas, luego X"
-
-### Aplicaciones
-
-Los quines no son solo ejercicios teóricos:
-- **Virus informáticos**: Los virus auto-replicantes son variantes de quines
-- **Compiladores bootstrapping**: Compilador que se compila a sí mismo
-- **Teoría de la computación**: Demostración de propiedades de Turing-completeness
+4. **Buffer overflow in Sully**:
+   - `char f[32]` must be sufficient for `Sully_X.c`
+   - `char c[128]` must be sufficient for the complete command
 
 ---
 
-## Recursos Adicionales
+## Theoretical Concepts
+
+### Kleene's Recursion Theorem
+
+Quines are possible because of **Kleene's recursion theorem**, which states:
+> For any computable function f, there exists a program p such that p produces f(p) as output.
+
+In a quine, f is the identity function, so p produces p.
+
+### The Quine Paradox
+
+How can a program describe itself without reading itself?
+
+**Answer**: By using a data structure that describes itself on two levels:
+1. **Code**: "Print X in quotes, then X"
+2. **Data X**: "Print X in quotes, then X"
+
+### Applications
+
+Quines are not just theoretical exercises:
+- **Computer viruses**: Self-replicating viruses are quine variants
+- **Bootstrapping compilers**: Compiler that compiles itself
+- **Computation theory**: Demonstration of Turing-completeness properties
+
+---
+
+## Additional Resources
 
 - [Printf format specifiers (C Reference)](https://en.cppreference.com/w/c/io/fprintf)
 - [Quine (computing) - Wikipedia](https://en.wikipedia.org/wiki/Quine_(computing))
@@ -577,31 +573,29 @@ Los quines no son solo ejercicios teóricos:
 
 ---
 
-## Tips para Crear Quines
+## Tips for Creating Quines
 
-1. **Empieza con la estructura básica**:
+1. **Start with the basic structure**:
    ```c
    char*s="...";
    printf(s, args...);
    ```
 
-2. **Identifica qué necesitas imprimir**:
-   - Todo el código antes de `s`
-   - La declaración de `s` con comillas
-   - Todo el código después de `s`
+2. **Identify what you need to print**:
+   - All code before `s`
+   - The declaration of `s` with quotes
+   - All code after `s`
 
-3. **Codifica con placeholders**:
-   - `%1$c` para newlines
-   - `%2$c` para tabs
-   - `%3$c` para comillas
-   - `%N$s` para la auto-referencia
+3. **Encode with placeholders**:
+   - `%1$c` for newlines
+   - `%2$c` for tabs
+   - `%3$c` for quotes
+   - `%N$s` for self-reference
 
-4. **Verifica paso a paso**:
-   - Imprime solo una parte primero
-   - Verifica que los espacios sean correctos
-   - Añade el resto gradualmente
-
-5. **Cuenta los argumentos**:
+4. **Verify step by step**:
+   - Print only one part first
+   - Verify that spacing is correct
+   - Add the rest gradually
    - Asegúrate de que cada `%N$X` tenga su argumento correspondiente
    - No olvides el argumento de auto-referencia al final
 

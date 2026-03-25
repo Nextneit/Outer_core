@@ -1,173 +1,173 @@
-# Dr-Quine - Implementación en Python
+# Dr-Quine - Python Implementation
 
-Este directorio contiene la implementación en Python del proyecto **dr-quine** de la escuela 42. Un **quine** es un programa que imprime su propio código fuente sin leer ningún archivo.
+This directory contains the Python implementation of the **dr-quine** project from School 42. A **quine** is a program that prints its own source code without reading any external file.
 
-## Índice
-- [Ejecución](#ejecución)
-- [Conceptos Fundamentales](#conceptos-fundamentales)
-- [Colleen.py - Quine Básico](#colleenpy---quine-básico)
-- [Grace.py - Quine que Genera un Archivo](#gracepy---quine-que-genera-un-archivo)
-- [Sully.py - Quine Recursivo](#sullypy---quine-recursivo)
-- [Técnicas Avanzadas](#técnicas-avanzadas)
+## Index
+- [Execution](#execution)
+- [Fundamental Concepts](#fundamental-concepts)
+- [Colleen.py - Basic Quine](#colleenpy---basic-quine)
+- [Grace.py - File-Generating Quine](#gracepy---file-generating-quine)
+- [Sully.py - Recursive Quine](#sullypy---recursive-quine)
+- [Advanced Techniques](#advanced-techniques)
 
 ---
 
-## Ejecución
+## Execution
 
-### Ejecutar tests
+### Run tests
 ```bash
-make           # Ejecuta todos los tests
+make           # Run all tests
 ```
 
-### Ejecutar individualmente
+### Run individually
 ```bash
 python3 Colleen.py
 python3 Grace.py
 python3 Sully.py
 ```
 
-### Limpiar archivos generados
+### Clean generated files
 ```bash
-make clean     # Limpia archivos temporales
-make fclean    # Limpieza completa (incluye archivos generados)
+make clean     # Clean temporary files
+make fclean    # Complete cleanup (including generated files)
 ```
 
 ---
 
-## Conceptos Fundamentales
+## Fundamental Concepts
 
-### ¿Qué es un Quine?
+### What is a Quine?
 
-Un quine es un programa que produce su propio código fuente como salida, **sin**:
-- Leer archivos (`open`, `read`, etc.)
-- Usar `sys.argv[0]` o información del sistema
-- Hacer trampa de ninguna forma
+A quine is a program that produces its own source code as output, **without**:
+- Reading files (`open`, `read`, etc.)
+- Using `sys.argv[0]` or system information
+- Cheating in any form
 
-### Restricciones del Proyecto
+### Project Constraints
 
-Cada programa debe cumplir:
-- **Colleen**: Imprime su propio código fuente a stdout
-- **Grace**: Escribe su propio código fuente en un archivo (`Grace_kid.py`)
-- **Sully**: Genera una cadena de 6 quines que se auto-replican decrementando un contador
+Each program must satisfy:
+- **Colleen**: Prints its own source code to stdout
+- **Grace**: Writes its own source code to a file (`Grace_kid.py`)
+- **Sully**: Generates a chain of 6 quines that self-replicate by decrementing a counter
 
-### Técnica Clave: `%r` (repr) en Python
+### Key Technique: `%r` (repr) in Python
 
-La técnica fundamental en Python es usar `%r` con formato `%`:
+The fundamental technique in Python is using `%r` with `%` formatting:
 
 ```python
 s = 's = %r\nprint(s %% s)'
 print(s % s)
 ```
 
-**Por qué funciona**:
-- `%r` aplica `repr()` al argumento, añadiendo comillas simples y escapando caracteres especiales automáticamente
-- `%%` genera un `%` literal en la salida
-- Al sustituir `s % s`, el string se inserta dentro de sí mismo completo con sus comillas
+**Why it works**:
+- `%r` applies `repr()` to the argument, automatically adding single quotes and escaping special characters
+- `%%` generates a literal `%` in the output
+- When substituting `s % s`, the string inserts itself completely with its quotes
 
-### Valores Clave
+### Key Values
 
-| Técnica | Uso |
-|---------|-----|
-| `%r` | Inserta la representación del string con comillas (auto-referencia) |
-| `%%` | Imprime un `%` literal (necesario para que el hijo sea válido) |
-| `%d` | Inserta un entero (para el contador en Sully) |
+| Technique | Usage |
+|-----------|-------|
+| `%r` | Inserts the string representation with quotes (self-reference) |
+| `%%` | Prints a literal `%` (necessary for child to be valid) |
+| `%d` | Inserts an integer (for counter in Sully) |
 
 ---
 
-## Colleen.py - Quine Básico
+## Colleen.py - Basic Quine
 
-### Descripción
-Imprime su propio código fuente a **stdout**.
+### Description
+Prints its own source code to **stdout**.
 
-### Código Completo
+### Complete Code
 ```python
 s = 's = %r\nprint(s %% s)'
 print(s % s)
 ```
 
-### Análisis Detallado
+### Detailed Analysis
 
-#### El String `s`
+#### The String `s`
 
 ```python
 s = 's = %r\nprint(s %% s)'
 ```
 
-El string contiene **casi todo el código del programa** con un placeholder `%r`.
+The string contains **almost the entire program code** with a `%r` placeholder.
 
-#### Funcionamiento Paso a Paso
+#### Step-by-Step Execution
 
-1. `s` se define con el template del código
-2. `s % s` aplica el formato:
-   - `%r` se reemplaza por `repr(s)` → el string con sus comillas: `'s = %r\nprint(s %% s)'`
-   - `%%` se convierte en `%` literal
-3. El resultado es:
+1. `s` is defined with the code template
+2. `s % s` applies the format:
+   - `%r` is replaced by `repr(s)` → the string with its quotes: `'s = %r\nprint(s %% s)'`
+   - `%%` becomes a literal `%`
+3. The result is:
    ```python
    s = 's = %r\nprint(s %% s)'
    print(s % s)
    ```
 
-#### Por Qué `%r` es Perfecto para Quines
+#### Why `%r` is Perfect for Quines
 
-- `repr(s)` produce `'s = %r\nprint(s %% s)'` (nota las comillas y el `\n` escapado)
-- Al insertar eso después de `s = `, reproduce exactamente la primera línea del código
-- El `%%` en el template se convierte en `%` en la salida, haciendo al hijo ejecutable
+- `repr(s)` produces `'s = %r\nprint(s %% s)'` (note the quotes and escaped `\n`)
+- Inserting that after `s = ` reproduces exactly the first line of code
+- The `%%` in the template becomes `%` in the output, making the child executable
 
-### Requisitos Cumplidos
-- ✅ Imprime su propio código fuente exactamente
-- ✅ No lee ningún archivo
+### Requirements Met
+- ✅ Prints its own source code exactly
+- ✅ Reads no external files
 
 ---
 
-## Grace.py - Quine que Genera un Archivo
+## Grace.py - File-Generating Quine
 
-### Descripción
-Escribe su propio código fuente en **Grace_kid.py**.
+### Description
+Writes its own source code to **Grace_kid.py**.
 
-### Código Completo
+### Complete Code
 ```python
 s = 's = %r\nwith open("Grace_kid.py", "w") as f:\n    f.write(s %% s)\n'
 with open("Grace_kid.py", "w") as f:
     f.write(s % s)
 ```
 
-### Análisis Detallado
+### Detailed Analysis
 
-#### El String `s`
+#### The String `s`
 
 ```python
 s = 's = %r\nwith open("Grace_kid.py", "w") as f:\n    f.write(s %% s)\n'
 ```
 
-El string codifica todo el programa, incluyendo el bloque `with open(...)`.
+The string encodes the entire program, including the `with open(...)` block.
 
-#### Funcionamiento Paso a Paso
+#### Step-by-Step Execution
 
-1. `s` contiene el template con el código completo (newlines escapados como `\n`)
+1. `s` contains the template with the complete code (newlines escaped as `\n`)
 2. `s % s`:
-   - `%r` → `repr(s)` → el string con sus comillas y escapes
-   - `%%` → `%` literal
-3. El resultado se escribe en `Grace_kid.py`
-4. `Grace_kid.py` es idéntico al código fuente de `Grace.py`
+   - `%r` → `repr(s)` → the string with its quotes and escapes
+   - `%%` → literal `%`
+3. The result is written to `Grace_kid.py`
+4. `Grace_kid.py` is identical to the source code of `Grace.py`
 
-#### Verificación
+#### Verification
 ```bash
 python3 Grace.py
-diff Grace.py Grace_kid.py   # Sin diferencias
+diff Grace.py Grace_kid.py   # No differences
 ```
 
-### Requisitos Cumplidos
-- ✅ `Grace_kid.py` es idéntico a `Grace.py`
-- ✅ No lee ningún archivo
+### Requirements Met
+- ✅ `Grace_kid.py` is identical to `Grace.py`
+- ✅ Reads no external files
 
 ---
 
-## Sully.py - Quine Recursivo
+## Sully.py - Recursive Quine
 
-### Descripción
-Genera una cadena de quines que se auto-replican, ejecutan y decrementan un contador en cada generación, produciendo 6 archivos en total (`Sully_5.py` hasta `Sully_1.py`) más sus respectivas ejecuciones.
+### Description
+Generates a chain of quines that self-replicate, execute, and decrement a counter in each generation, producing 6 files in total (`Sully_5.py` through `Sully_1.py`) plus their respective executions.
 
-### Código Completo
+### Complete Code
 ```python
 import subprocess
 s = 'import subprocess\ns = %r\ni = %d\nif i > 0:\n    fname = "Sully_" + str(i) + ".py"\n    with open(fname, "w") as f:\n        f.write(s %% (s, i - 1))\n    subprocess.run(["python3", fname])\n'
@@ -179,90 +179,90 @@ if i > 0:
     subprocess.run(["python3", fname])
 ```
 
-### Análisis Línea por Línea
+### Line-by-Line Analysis
 
-#### Variables Principales
+#### Main Variables
 ```python
-s = 'import subprocess\n...'   # Template con todo el código
-i = 5                          # Contador inicial
+s = 'import subprocess\n...'   # Template with all the code
+i = 5                          # Initial counter
 ```
 
-#### El Template con Dos Placeholders
+#### The Template with Two Placeholders
 ```python
 s = '...s = %r\ni = %d\n...'
 ```
-- `%r` → `repr(s)` (auto-referencia al código)
-- `%d` → el contador decrementado
+- `%r` → `repr(s)` (self-reference to the code)
+- `%d` → the decremented counter
 
-#### Fase 1: Validación
+#### Phase 1: Validation
 ```python
 if i > 0:
 ```
-Si el contador llega a 0, el programa no genera más hijos ni ejecuta nada.
+If the counter reaches 0, the program generates no more children and does nothing.
 
-#### Fase 2: Generación del Archivo Hijo
+#### Phase 2: Child File Generation
 ```python
 fname = "Sully_" + str(i) + ".py"
 with open(fname, "w") as f:
     f.write(s % (s, i - 1))
 ```
 
-**¡CLAVE!**: `s % (s, i - 1)` usa dos argumentos:
-- `s` → sustituye `%r` (el código completo con repr)
-- `i - 1` → sustituye `%d` (**contador decrementado**)
+**KEY**: `s % (s, i - 1)` uses two arguments:
+- `s` → replaces `%r` (the complete code with repr)
+- `i - 1` → replaces `%d` (**decremented counter**)
 
-El archivo hijo tiene el mismo código pero con `i = i-1`.
+The child file has the same code but with `i = i-1`.
 
-#### Fase 3: Ejecución Recursiva
+#### Phase 3: Recursive Execution
 ```python
 subprocess.run(["python3", fname])
 ```
-Ejecuta el hijo, que a su vez generará su propio hijo con `i-2`, y así sucesivamente.
+Executes the child, which in turn will generate its own child with `i-2`, and so on.
 
-### Cadena de Ejecución Completa
+### Complete Execution Chain
 
 ```
 Sully.py (i=5)
-  ├─> crea Sully_5.py (con i=4)
-  └─> ejecuta python3 Sully_5.py
-        ├─> crea Sully_4.py (con i=3)
-        └─> ejecuta python3 Sully_4.py
-              ├─> crea Sully_3.py (con i=2)
-              └─> ejecuta python3 Sully_3.py
-                    ├─> crea Sully_2.py (con i=1)
-                    └─> ejecuta python3 Sully_2.py
-                          ├─> crea Sully_1.py (con i=0)
-                          └─> ejecuta python3 Sully_1.py
-                                └─> i = 0, no genera más hijos
+  ├─> creates Sully_5.py (with i=4)
+  └─> executes python3 Sully_5.py
+        ├─> creates Sully_4.py (with i=3)
+        └─> executes python3 Sully_4.py
+              ├─> creates Sully_3.py (with i=2)
+              └─> executes python3 Sully_3.py
+                    ├─> creates Sully_2.py (with i=1)
+                    └─> executes python3 Sully_2.py
+                          ├─> creates Sully_1.py (with i=0)
+                          └─> executes python3 Sully_1.py
+                                └─> i = 0, generates no more children
 ```
 
-**Archivos generados**: `Sully_5.py`, `Sully_4.py`, `Sully_3.py`, `Sully_2.py`, `Sully_1.py` (6 en total contando `Sully.py`)
+**Generated files**: `Sully_5.py`, `Sully_4.py`, `Sully_3.py`, `Sully_2.py`, `Sully_1.py` (6 in total counted with `Sully.py`)
 
-### Requisitos Cumplidos
-- ✅ Genera exactamente 6 scripts en la cadena
-- ✅ Cada hijo es un quine válido con counter decrementado
-- ✅ La cadena se detiene cuando `i = 0`
+### Requirements Met
+- ✅ Generates exactly 6 scripts in the chain
+- ✅ Each child is a valid quine with decremented counter
+- ✅ The chain stops when `i = 0`
 
 ---
 
-## Técnicas Avanzadas
+## Advanced Techniques
 
-### Por Qué Python es Ideal para Quines
+### Why Python is Ideal for Quines
 
-Python facilita la escritura de quines gracias a:
+Python facilitates writing quines thanks to:
 
-1. **`%r` con `repr()`**: Produce automáticamente una representación del string con comillas y escapes, evitando la necesidad de codificar manualmente delimitadores.
+1. **`%r` with `repr()`**: Automatically produces a string representation with quotes and escapes, avoiding the need to manually encode delimiters.
 
-2. **Strings multilínea y `\n`**: Los saltos de línea se pueden codificar como `\n` dentro del string y `repr()` los preserva correctamente.
+2. **Multiline strings and `\n`**: Line breaks can be encoded as `\n` within the string and `repr()` preserves them correctly.
 
-3. **Formato `%`**: El operador `%` permite sustituir múltiples valores (`%r`, `%d`, `%%`) de forma compacta.
+3. **`%` formatting**: The `%` operator allows substituting multiple values (`%r`, `%d`, `%%`) in a compact way.
 
-### Comparación con la Versión en C
+### Comparison with C Version
 
-| Aspecto | C | Python |
+| Aspect | C | Python |
 |---------|---|--------|
-| Auto-referencia | `%4$s` con argumentos posicionales | `%r` con repr() |
-| Newlines | `%1$c` con valor `10` | `\n` escapado en string |
-| Comillas | `%3$c` con valor `34` | Manejado por `repr()` |
-| Ejecución de hijos (Sully) | `system()` + compilación gcc | `subprocess.run()` directo |
-| Complejidad del quine | Media-alta | Baja |
+| Self-reference | `%4$s` with positional arguments | `%r` with repr() |
+| Newlines | `%1$c` with value `10` | `\n` escaped in string |
+| Quotes | `%3$c` with value `34` | Handled by `repr()` |
+| Child execution (Sully) | `system()` + gcc compilation | `subprocess.run()` direct |
+| Quine complexity | Medium-high | Low |

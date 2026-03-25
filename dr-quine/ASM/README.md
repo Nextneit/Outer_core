@@ -1,139 +1,139 @@
-# Dr-Quine - Implementación en Assembly (NASM x64)
+# Dr-Quine - Assembly Implementation (NASM x64)
 
-Este directorio contiene la implementación en Assembly x64 (NASM) del proyecto **dr-quine** de la escuela 42. Un **quine** es un programa que imprime su propio código fuente sin leer ningún archivo.
+This directory contains the x64 Assembly (NASM) implementation of the **dr-quine** project from School 42. A **quine** is a program that prints its own source code without reading any external file.
 
-## Índice
-- [Compilación y Ejecución](#compilación-y-ejecución)
-- [Conceptos Fundamentales](#conceptos-fundamentales)
-- [Colleen.s - Quine Básico](#colleens---quine-básico)
-- [Grace.s - Quine a Archivo](#graces---quine-a-archivo)
-- [Sully.s - Quine Recursivo](#sullys---quine-recursivo)
-- [Detalles Técnicos](#detalles-técnicos)
+## Index
+- [Compilation and Execution](#compilation-and-execution)
+- [Fundamental Concepts](#fundamental-concepts)
+- [Colleen.s - Basic Quine](#colleens---basic-quine)
+- [Grace.s - File Output Quine](#graces---file-output-quine)
+- [Sully.s - Recursive Quine](#sullys---recursive-quine)
+- [Technical Details](#technical-details)
 
 ---
 
-## Compilación y Ejecución
+## Compilation and Execution
 
-### Compilar todos los programas
+### Compile all programs
 ```bash
 make
 ```
 
-### Ejecutar tests
+### Run tests
 ```bash
-make test              # Ejecuta todos los tests
-make test_colleen      # Test individual de Colleen
-make test_grace        # Test individual de Grace
-make test_sully        # Test individual de Sully
+make test              # Run all tests
+make test_colleen      # Colleen individual test
+make test_grace        # Grace individual test
+make test_sully        # Sully individual test
 ```
 
-### Limpiar archivos generados
+### Clean generated files
 ```bash
-make clean    # Limpia binarios y objetos
-make fclean   # Limpieza completa
+make clean    # Clean binaries and objects
+make fclean   # Complete cleanup
 ```
 
 ---
 
-## Conceptos Fundamentales
+## Fundamental Concepts
 
-### ¿Qué es un Quine?
+### What is a Quine?
 
-Un quine es un programa que produce su propio código fuente como salida, **sin**:
-- Leer archivos
-- Usar `argv[0]` o similares
-- Hacer trampa de ninguna forma
+A quine is a program that produces its own source code as output, **without**:
+- Reading files
+- Using `argv[0]` or similar
+- Cheating in any form
 
-### Técnica de Implementación
+### Implementation Technique
 
-La técnica principal utilizada en estos quines es la **auto-referencia con placeholders**:
+The main technique used in these quines is **self-reference with placeholders**:
 
-1. **String codificado**: Se define una cadena `s` que contiene todo el código del programa, pero con placeholders en lugar de valores literales.
+1. **Encoded string**: A string `s` is defined that contains the entire program code, but with placeholders instead of literal values.
 
-2. **Formato posicional**: Se usa `printf`/`fprintf` con argumentos posicionales (`%1$c`, `%2$c`, etc.) para poder reutilizar argumentos.
+2. **Positional format**: `printf`/`fprintf` is used with positional arguments (`%1$c`, `%2$c`, etc.) to reuse arguments.
 
-3. **Valores clave**:
+3. **Key values**:
    - `10` = newline (`\n`)
    - `9` = tab (`\t`)
-   - `34` = comillas dobles (`"`)
-   - La dirección de `s` misma (auto-referencia)
+   - `34` = double quote (`"`)
+   - The address of `s` itself (self-reference)
 
-### Convención de Llamada x64
+### x64 Calling Convention
 
-Los programas utilizan la convención de llamada System V AMD64:
-- **Primeros 6 argumentos**: `rdi`, `rsi`, `rdx`, `rcx`, `r8`, `r9`
-- **Argumentos adicionales**: Se pasan por el stack
-- **Registros callee-saved**: `rbx`, `r12-r15`, `rbp`, `rsp`
-- **Alineación del stack**: Debe estar alineado a 16 bytes antes de `call`
+The programs use the System V AMD64 calling convention:
+- **First 6 arguments**: `rdi`, `rsi`, `rdx`, `rcx`, `r8`, `r9`
+- **Additional arguments**: Passed on the stack
+- **Callee-saved registers**: `rbx`, `r12-r15`, `rbp`, `rsp`
+- **Stack alignment**: Must be 16-byte aligned before `call`
 
 ---
 
-## Colleen.s - Quine Básico
+## Colleen.s - Basic Quine
 
-### Descripción
-Imprime su propio código fuente a **stdout**.
+### Description
+Prints its own source code to **stdout**.
 
-### Estructura del Código
+### Code Structure
 
 #### section .data
 ```nasm
 s: db "; Outer comment%1$c...%1$c",0
 ```
-- Contiene todo el código del programa codificado
+- Contains the entire program code encoded
 - Placeholders: `%1$c` (newline), `%2$c` (tab), `%3$c` (quote), `%4$s` (string s)
 
 #### section .text - main
 ```nasm
 main:
     push rbp
-    mov rbp,rsp           ; Prólogo estándar
+    mov rbp,rsp           ; Standard prologue
     
-    ; Preparar argumentos para printf
-    lea rdi,[s]           ; arg1: formato (string s)
+    ; Prepare printf arguments
+    lea rdi,[s]           ; arg1: format (string s)
     mov rsi,10            ; arg2: %1$c = newline
     mov rdx,9             ; arg3: %2$c = tab
-    mov rcx,34            ; arg4: %3$c = comillas dobles
-    lea r8,[s]            ; arg5: %4$s = dirección de string s
+    mov rcx,34            ; arg4: %3$c = double quote
+    lea r8,[s]            ; arg5: %4$s = address of string s
     
-    xor rax,rax           ; rax=0 (no hay args vectoriales)
-    call printf           ; Imprimir el quine
+    xor rax,rax           ; rax=0 (no vector arguments)
+    call printf           ; Print the quine
     
     xor rax,rax           ; return 0
     pop rbp
     ret
 ```
 
-### Funcionamiento Paso a Paso
+### Step-by-Step Execution
 
-1. **Carga del formato**: `rdi` apunta a `s`, que contiene el formato con placeholders
-2. **Argumentos posicionales**: Se cargan los valores que sustituirán los placeholders
-3. **Auto-referencia**: El 5º argumento (`r8`) contiene la dirección de `s` misma
-4. **Printf**: Interpreta el formato y sustituye:
+1. **Format loading**: `rdi` points to `s`, which contains the format with placeholders
+2. **Positional arguments**: Values that will replace placeholders are loaded
+3. **Self-reference**: The 5th argument (`r8`) contains the address of `s` itself
+4. **Printf**: Interprets the format and substitutes:
    - `%1$c` → newline (10)
    - `%2$c` → tab (9)
-   - `%3$c` → comilla doble (34)
-   - `%4$s` → contenido de `s`
+   - `%3$c` → double quote (34)
+   - `%4$s` → content of `s`
 
-El resultado es el código completo, incluyendo los comentarios y la definición de `s`.
+The result is the complete code, including comments and the definition of `s`.
 
-### Requisitos del proyecto
-- ✅ 2 comentarios (outer e inner)
-- ✅ 1 función auxiliar (implícita: la función main es llamada desde _start)
+### Project Requirements
+- ✅ 2 comments (outer and inner)
+- ✅ 1 helper function (implicit: main is called from _start)
 
 ---
 
-## Grace.s - Quine a Archivo
+## Grace.s - File Output Quine
 
-### Descripción
-Escribe su propio código fuente en el archivo **Grace_kid.s** (sin ejecutarse a sí mismo).
+### Description
+Writes its own source code to the file **Grace_kid.s** (without executing itself).
 
-### Estructura del Código
+### Code Structure
 
 #### section .data
 ```nasm
 s: db "; Comment%1$csection .data%1$c...",0
-f: db "Grace_kid.s",0      ; Nombre del archivo de salida
-mode: db "w",0              ; Modo de apertura: escritura
+f: db "Grace_kid.s",0      ; Output filename
+mode: db "w",0              ; Open mode: write
 ```
 
 #### section .text - main
@@ -142,23 +142,23 @@ main:
     push rbp
     mov rbp,rsp
     
-    ; 1. Abrir archivo Grace_kid.s
-    lea rdi,[f]           ; arg1: nombre de archivo
-    lea rsi,[mode]        ; arg2: modo "w"
+    ; 1. Open Grace_kid.s file
+    lea rdi,[f]           ; arg1: filename
+    lea rsi,[mode]        ; arg2: mode "w"
     call fopen
-    mov r12,rax           ; Guardar file pointer en r12 (callee-saved)
+    mov r12,rax           ; Save file pointer in r12 (callee-saved)
     
-    ; 2. Escribir el quine al archivo
+    ; 2. Write quine to file
     mov rdi,r12           ; arg1: file pointer
-    lea rsi,[s]           ; arg2: formato (string s)
+    lea rsi,[s]           ; arg2: format (string s)
     mov rdx,10            ; arg3: %1$c = newline
     mov rcx,9             ; arg4: %2$c = tab
-    mov r8,34             ; arg5: %3$c = comillas dobles
-    lea r9,[s]            ; arg6: %4$s = dirección de string s
+    mov r8,34             ; arg5: %3$c = double quote
+    lea r9,[s]            ; arg6: %4$s = address of string s
     xor rax,rax
     call fprintf
     
-    ; 3. Cerrar archivo
+    ; 3. Close file
     mov rdi,r12
     call fclose
     
@@ -167,37 +167,37 @@ main:
     ret
 ```
 
-### Funcionamiento
+### Execution
 
-1. **Apertura**: `fopen` crea `Grace_kid.s` en modo escritura
-2. **Escritura**: `fprintf` escribe el código completo al archivo (igual que printf en Colleen)
-3. **Cierre**: `fclose` cierra el archivo
-4. **Resultado**: El archivo `Grace_kid.s` es idéntico a `Grace.s`
+1. **Opening**: `fopen` creates `Grace_kid.s` in write mode
+2. **Writing**: `fprintf` writes the complete code to the file (same as printf in Colleen)
+3. **Closing**: `fclose` closes the file
+4. **Result**: The file `Grace_kid.s` is identical to `Grace.s`
 
-### Diferencias con Colleen
-- Usa `fprintf` en lugar de `printf`
-- Escribe a archivo en lugar de stdout
-- Usa `r12` para guardar el file pointer (registro callee-saved)
+### Differences with Colleen
+- Uses `fprintf` instead of `printf`
+- Writes to file instead of stdout
+- Uses `r12` to save the file pointer (callee-saved register)
 
-### Requisitos del proyecto
-- ✅ 1 comentario
-- ✅ Definición de macros simulada (variables de string en .data)
-- ✅ No se ejecuta a sí mismo
+### Project Requirements
+- ✅ 1 comment
+- ✅ Simulated macro definition (string variables in .data)
+- ✅ Does not execute itself
 
 ---
 
-## Sully.s - Quine Recursivo
+## Sully.s - Recursive Quine
 
-### Descripción
-Genera una cadena de quines recursivos que se auto-replican y ejecutan, decrementando un contador en cada generación hasta llegar a 0.
+### Description
+Generates a chain of recursive quines that self-replicate and execute, decrementing a counter with each generation until reaching 0.
 
-### Estructura del Código
+### Code Structure
 
 #### section .data
 ```nasm
-s: db "section .data%1$c...",0            ; Código completo
-fmt: db "Sully_%d.s",0                    ; Formato para nombre de archivo
-mode: db "w",0                            ; Modo de escritura
+s: db "section .data%1$c...",0            ; Complete code
+fmt: db "Sully_%d.s",0                    ; Format for filename
+mode: db "w",0                            ; Write mode
 cmd: db "nasm -f elf64 Sully_%d.s && gcc -no-pie Sully_%d.o -o Sully_%d && ./Sully_%d",0
 ```
 
@@ -218,12 +218,12 @@ main:
     
     mov r15d,5            ; Inicializar contador i=5
     cmp r15d,0
-    jl .end               ; Si i < 0, terminar
+    jl .end               ; If i < 0, exit
 ```
 
-### Fases de Ejecución
+### Execution Phases
 
-#### Fase 1: Generar nombre de archivo
+#### Phase 1: Generate filename
 ```nasm
     lea rdi,[filename]
     lea rsi,[fmt]         ; "Sully_%d.s"
@@ -232,58 +232,53 @@ main:
     call sprintf          ; filename = "Sully_5.s"
 ```
 
-#### Fase 2: Escribir el quine con contador decrementado
+#### Phase 2: Write the quine with decremented counter
 ```nasm
-    ; Abrir archivo
+    ; Open file
     lea rdi,[filename]
     lea rsi,[mode]
     call fopen
     mov r12,rax
     
-    ; Escribir con fprintf(f, s, 10, 9, i-1, 34, s)
+    ; Write with fprintf(f, s, 10, 9, i-1, 34, s)
     mov rdi,r12           ; file pointer
-    lea rsi,[s]           ; formato
+    lea rsi,[s]           ; format
     mov rdx,10            ; %1$c = newline
     mov rcx,9             ; %2$c = tab
     mov r8,r15
-    dec r8                ; %3$d = i-1 (¡DECREMENTAR!)
-    mov r9,34             ; %4$c = comillas
-    
-    ; 7º argumento al stack (dirección de s)
-    lea rax,[s]
-    sub rsp,8             ; Alinear stack
-    push rax              ; %5$s = string s
+    dec r8                ; %3$d = i-1 (DECREMENT!)
+    lea r9,[s]            ; arg6: %4$s = address of string s
     xor rax,rax
     call fprintf
-    add rsp,16            ; Limpiar stack
+    add rsp,16            ; Clean stack
     
     mov rdi,r12
     call fclose
 ```
 
-**Clave**: El `dec r8` decrementa el contador antes de pasarlo como argumento. Así:
-- `Sully.s` tiene `i=5` y genera `Sully_5.s` con `i=4`
-- `Sully_5.s` tiene `i=4` y genera `Sully_4.s` con `i=3`
-- Y así sucesivamente...
+**Key**: The `dec r8` instruction decrements the counter before passing it as an argument. Thus:
+- `Sully.s` has `i=5` and generates `Sully_5.s` with `i=4`
+- `Sully_5.s` has `i=4` and generates `Sully_4.s` with `i=3`
+- And so on...
 
-#### Fase 3: Compilar y ejecutar (si i > 0)
+#### Phase 3: Compile and Execute (if i > 0)
 ```nasm
     cmp r15d,0
-    jle .end              ; Si i <= 0, no ejecutar
+    jle .end              ; If i <= 0, do not execute
     
-    ; Construir comando
+    ; Build command
     lea rdi,[cmdbuf]
     lea rsi,[cmd]
-    mov rdx,r15           ; i (4 veces en el comando)
+    mov rdx,r15           ; i (4 times in the command)
     mov rcx,r15
     mov r8,r15
     mov r9,r15
     xor rax,rax
     call sprintf
     
-    ; Ejecutar
+    ; Execute
     lea rdi,[cmdbuf]
-    call system           ; Esto inicia la recursión
+    call system           ; This starts the recursion
     
 .end:
     xor rax,rax
@@ -291,105 +286,105 @@ main:
     ret
 ```
 
-### Cadena de Ejecución
+### Execution Chain
 
 ```
 Sully (i=5)
-  ├─> genera Sully_5.s (i=4)
-  └─> compila y ejecuta Sully_5
-        ├─> genera Sully_4.s (i=3)
-        └─> compila y ejecuta Sully_4
-              ├─> genera Sully_3.s (i=2)
-              └─> compila y ejecuta Sully_3
-                    ├─> genera Sully_2.s (i=1)
-                    └─> compila y ejecuta Sully_2
-                          ├─> genera Sully_1.s (i=0)
-                          └─> compila y ejecuta Sully_1
-                                ├─> genera Sully_0.s (i=-1)
-                                └─> NO ejecuta (i=0)
+  ├─> generates Sully_5.s (i=4)
+  └─> compiles and executes Sully_5
+        ├─> generates Sully_4.s (i=3)
+        └─> compiles and executes Sully_4
+              ├─> generates Sully_3.s (i=2)
+              └─> compiles and executes Sully_3
+                    ├─> generates Sully_2.s (i=1)
+                    └─> compiles and executes Sully_2
+                          ├─> generates Sully_1.s (i=0)
+                          └─> compiles and executes Sully_1
+                                ├─> generates Sully_0.s (i=-1)
+                                └─> does NOT execute (i=0)
 ```
 
-### Archivos Generados
+### Generated Files
 
-Un total de **11 archivos** (sin contar .o):
-- `Sully_5.s` a `Sully_0.s` → 6 archivos .s
-- `Sully_5` a `Sully_1` → 5 binarios ejecutables
-- (`Sully_0.s` no se compila porque `i=0` activa `jle .end`)
+A total of **11 files** (not counting .o):
+- `Sully_5.s` through `Sully_0.s` → 6 .s files
+- `Sully_5` through `Sully_1` → 5 executable binaries
+- (`Sully_0.s` is not compiled because `i=0` triggers `jle .end`)
 
-### Requisitos del proyecto
-- ✅ Contador inicial `i=5`
-- ✅ Decrementa en cada iteración
-- ✅ Se detiene cuando `i=0`
-- ✅ Genera exactamente 13 archivos totales (incluyendo .o intermedios)
+### Project Requirements
+- ✅ Initial counter `i=5`
+- ✅ Decrements in each iteration
+- ✅ Stops when `i=0`
+- ✅ Generates exactly 13 total files (including intermediate .o files)
 
 ---
 
-## Detalles Técnicos
+## Technical Details
 
-### Argumentos Posicionales en printf/fprintf
+### Positional Arguments in printf/fprintf
 
-El formato `%N$X` permite:
-- **N**: Número de argumento (1-indexed)
-- **X**: Tipo de formato (`c`, `s`, `d`, etc.)
+The `%N$X` format allows:
+- **N**: Argument number (1-indexed)
+- **X**: Format type (`c`, `s`, `d`, etc.)
 
-Ejemplo:
+Example:
 ```nasm
 ; printf("%1$c %2$s %1$c", 10, "hello")
-; Resultado: "\n hello \n"
+; Result: "\n hello \n"
 ```
 
-Ventaja para quines: Reutilizar el mismo argumento múltiples veces.
+Advantage for quines: Reuse the same argument multiple times.
 
-### Alineación del Stack
+### Stack Alignment
 
-En x64, el stack debe estar alineado a 16 bytes antes de `call`:
+On x64, the stack must be 16-byte aligned before `call`:
 ```nasm
-push rbp        ; rsp -= 8 (ahora desalineado)
+push rbp        ; rsp -= 8 (now misaligned)
 mov rbp,rsp
-push r12        ; rsp -= 8 (alineado)
-push r15        ; rsp -= 8 (desalineado)
-sub rsp,32      ; rsp -= 32 (alineado de nuevo)
+push r12        ; rsp -= 8 (aligned)
+push r15        ; rsp -= 8 (misaligned)
+sub rsp,32      ; rsp -= 32 (aligned again)
 ```
 
-Cuando se pasa un 7º argumento por stack:
+When passing a 7th argument on the stack:
 ```nasm
-sub rsp,8       ; Pre-alinear
-push rax        ; Poner argumento
-call fprintf    ; rsp está alineado a 16 bytes
-add rsp,16      ; Limpiar (8+8)
+sub rsp,8       ; Pre-align
+push rax        ; Place argument
+call fprintf    ; rsp is 16-byte aligned
+add rsp,16      ; Clean (8+8)
 ```
 
-### Registros Utilizados
+### Registers Used
 
-- **r12**: File pointer (callee-saved, se preserva entre llamadas)
-- **r15**: Contador `i` en Sully (callee-saved)
-- **rax**: Valor de retorno de funciones, también se anula (`xor rax,rax`) para indicar 0 argumentos vectoriales en llamadas vararg
+- **r12**: File pointer (callee-saved, preserved between calls)
+- **r15**: Counter `i` in Sully (callee-saved)
+- **rax**: Return value of functions, also nullified (`xor rax,rax`) to indicate 0 vararg arguments in vararg calls
 
-### Funciones de la Biblioteca C
+### C Library Functions
 
-| Función | Propósito | Argumentos |
-|---------|-----------|------------|
-| `printf` | Imprimir a stdout | rdi=formato, rsi...=args |
-| `fprintf` | Imprimir a archivo | rdi=FILE*, rsi=formato, rdx...=args |
-| `fopen` | Abrir archivo | rdi=nombre, rsi=modo |
-| `fclose` | Cerrar archivo | rdi=FILE* |
-| `sprintf` | Formatear a string | rdi=buffer, rsi=formato, rdx...=args |
-| `system` | Ejecutar comando | rdi=comando |
+| Function | Purpose | Arguments |
+|----------|---------|-----------|
+| `printf` | Print to stdout | rdi=format, rsi...=args |
+| `fprintf` | Print to file | rdi=FILE*, rsi=format, rdx...=args |
+| `fopen` | Open file | rdi=name, rsi=mode |
+| `fclose` | Close file | rdi=FILE* |
+| `sprintf` | Format to string | rdi=buffer, rsi=format, rdx...=args |
+| `system` | Execute command | rdi=command |
 
-### Placeholders en el String s
+### Placeholders in String s
 
-El string `s` codifica:
-- **Estructura del código**: `section .data`, `section .text`, etc.
-- **Declaraciones**: `global main`, `extern printf`, etc.
-- **Instrucciones**: `push rbp`, `mov rbp,rsp`, etc.
-- **Todo separado por**: `%1$c` (newlines) y `%2$c` (tabs)
+The string `s` encodes:
+- **Code structure**: `section .data`, `section .text`, etc.
+- **Declarations**: `global main`, `extern printf`, etc.
+- **Instructions**: `push rbp`, `mov rbp,rsp`, etc.
+- **All separated by**: `%1$c` (newlines) and `%2$c` (tabs)
 
-Ejemplo fragmento de `s` en Colleen:
+Example fragment of `s` in Colleen:
 ```
 "section .data%1$c%2$cs: db %3$c%4$s%3$c,0%1$c%1$csection .text%1$c..."
 ```
 
-Cuando se ejecuta con argumentos (10, 9, 34, s):
+When executed with arguments (10, 9, 34, s):
 ```nasm
 section .data
 	s: db "...",0
@@ -420,29 +415,29 @@ diff Grace.s Grace_kid.s
 ```bash
 ./Sully
 ls Sully_*
-# Debería mostrar:
+# Should show:
 # Sully_0.s, Sully_1, Sully_1.s, Sully_2, Sully_2.s, ... Sully_5, Sully_5.s
 ```
 
 ---
 
-## Conceptos Clave para Entender los Quines
+## Key Concepts for Understanding Quines
 
-1. **Auto-referencia**: El string `s` se pasa a sí mismo como argumento
-2. **Formato posicional**: Permite usar el mismo argumento múltiples veces
-3. **Codificación cuidadosa**: Todo el código debe estar en `s`, incluyendo la definición de `s`
-4. **Balance perfecto**: El formato y los argumentos deben producir exactamente el código original
+1. **Self-reference**: The string `s` passes itself as an argument
+2. **Positional formatting**: Allows using the same argument multiple times
+3. **Careful encoding**: All code must be in `s`, including the definition of `s`
+4. **Perfect balance**: The format and arguments must produce exactly the original code
 
-## Recursos Adicionales
+## Additional Resources
 
-- [Convención de llamada x64 System V](https://wiki.osdev.org/System_V_ABI)
+- [x64 System V Calling Convention](https://wiki.osdev.org/System_V_ABI)
 - [NASM Documentation](https://www.nasm.us/xdoc/2.15.05/html/nasmdoc0.html)
 - [Printf format specifiers](https://en.cppreference.com/w/c/io/fprintf)
 - [Quine (computing) - Wikipedia](https://en.wikipedia.org/wiki/Quine_(computing))
 
 ---
 
-**Autor**: dr-quine ASM implementation  
+**Author**: dr-quine Assembly implementation  
 **Fecha**: 2026  
 **Assembler**: NASM 2.16+  
 **Arquitectura**: x86_64 Linux
