@@ -1,49 +1,49 @@
 # A2 - Broken Authentication (Reset Password)
 
-Vulnerabilidad del OWASP Top 10 (2017). En la pantalla de reset de contraseña, el email destino viaja en un campo oculto del formulario que el servidor acepta sin validación, permitiendo redirigir el reset a cualquier cuenta.
+OWASP Top 10 (2017) vulnerability. In the password reset screen, the target email travels in a hidden form field that the server accepts without validation, allowing password reset redirection to any account.
 
 ---
 
-## Pasos para obtener la flag
+## Steps to Obtain the Flag
 
-### 1. Identificar el vector
+### 1. Identify the Vector
 
-En el formulario de recuperación, el email destino está en un campo `hidden`:
+In the recovery form, the target email is in a `hidden` field:
 ```html
 <input type="hidden" name="mail" value="webmaster@borntosec.com" maxlength="15">
 ```
-Aunque no es editable visualmente, puede modificarse desde las DevTools del navegador o interceptando la petición.
+Although not visually editable, it can be modified from the browser's DevTools or by intercepting the request.
 
-### 2. Explotar
+### 2. Exploit
 
-1. Abrir las herramientas de desarrollador (F12) e inspeccionar el formulario.
-2. Localizar el campo `mail`.
-3. Cambiar su valor a:
+1. Open the developer tools (F12) and inspect the form.
+2. Locate the `mail` field.
+3. Change its value to:
    ```
    root@borntosec.co
    ```
-4. Enviar el formulario → la aplicación procesa el reset para ese email y devuelve la **flag**.
+4. Submit the form → the application processes the reset for that email and returns the **flag**.
 
-### 3. Por qué funciona
+### 3. Why It Works
 
-- La restricción estaba solo en el cliente (HTML/UI).
-- El backend no verifica la identidad ni la autorización del email recibido.
-- Acepta el parámetro manipulado sin comprobar su origen.
-
----
-
-## Impacto
-
-- **Account Takeover:** reset sobre cuentas privilegiadas sin autorización.
-- **Escalada de privilegios:** si se compromete un usuario administrador.
-- **Pérdida de confidencialidad:** acceso a cuentas con datos sensibles.
+- The restriction was only on the client (HTML/UI).
+- The backend does not verify the identity or authorization of the received email.
+- It accepts the manipulated parameter without checking its origin.
 
 ---
 
-## Mitigación
+## Impact
 
-1. **No confiar en campos del cliente para identidad sensible:** el email objetivo debe determinarse en servidor (ej. desde la sesión), nunca desde parámetros manipulables.
-2. **Tokens robustos:** aleatorios, de un solo uso, con expiración corta y ligados a una cuenta específica.
-3. **No usar campos `hidden` para datos sensibles:** son totalmente modificables por el usuario.
-4. **Rate limiting y logging** de intentos anómalos de reset.
-5. **Mensajes genéricos:** no revelar si un correo existe o no en el sistema.
+- **Account Takeover:** password reset on privileged accounts without authorization.
+- **Privilege Escalation:** if an admin user is compromised.
+- **Loss of Confidentiality:** access to accounts with sensitive data.
+
+---
+
+## Mitigation
+
+1. **Don't trust client fields for sensitive identity:** the target email should be determined on the server (e.g., from the session), never from manipulable parameters.
+2. **Robust Tokens:** random, single-use, with short expiration and tied to a specific account.
+3. **Don't use `hidden` fields for sensitive data:** they are completely modifiable by the user.
+4. **Rate limiting and logging** of anomalous reset attempts.
+5. **Generic Messages:** don't reveal whether an email exists in the system or not.

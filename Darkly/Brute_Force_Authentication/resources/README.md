@@ -1,23 +1,23 @@
 # A2 - Broken Authentication (Brute Force)
 
-Vulnerabilidad del OWASP Top 10 (2017). El formulario de login no tiene rate limiting ni bloqueo de intentos, permitiendo adivinar credenciales por fuerza bruta. El propio formulario da una pista del usuario a través de una imagen de Marvin.
+OWASP Top 10 (2017) vulnerability. The login form has no rate limiting or attempt blocking, allowing credentials to be guessed via brute force. The form itself provides a user hint through a Marvin image.
 
 ---
 
-## Pasos para obtener la flag
+## Steps to Obtain the Flag
 
-### 1. Identificar el vector
+### 1. Identify the Vector
 
-El login se realiza mediante GET con esta estructura:
+Login is performed via GET with this structure:
 ```
 http://<IP>/?page=signin&username={username}&password={password}&Login=Login#
 ```
 
-La imagen de Marvin en el formulario sugiere el usuario: `marvin`.
+The Marvin image in the form suggests the user: `marvin`.
 
-### 2. Fuerza bruta con ffuf
+### 2. Brute Force with ffuf
 
-Usando el diccionario `rockyou.txt`, todos los intentos devuelven HTTP 200, por lo que se filtra por tamaño de respuesta (`-fs`) para identificar el login correcto:
+Using the `rockyou.txt` dictionary, all attempts return HTTP 200, so we filter by response size (`-fs`) to identify the correct login:
 
 ```bash
 ffuf -w rockyou.txt \
@@ -25,31 +25,31 @@ ffuf -w rockyou.txt \
      -fs 1990
 ```
 
-La contraseña válida es: **`shadow`**
+The valid password is: **`shadow`**
 
-### 3. Acceder y obtener la flag
+### 3. Login and Obtain the Flag
 
-Credenciales:
+Credentials:
 - **Username:** `marvin`
 - **Password:** `shadow`
 
-Iniciar sesión → la aplicación muestra la **flag**.
+Log in → the application displays the **flag**.
 
 ---
 
-## Impacto
+## Impact
 
-- **Credenciales débiles/predecibles:** usuario deducible desde la interfaz y contraseña en diccionario común.
-- **Sin rate limiting:** permite miles de intentos sin restricción.
-- **Sin bloqueo progresivo:** no hay defensa contra intentos repetidos.
+- **Weak/Predictable Credentials:** user deducible from the interface and password in common dictionary.
+- **No Rate Limiting:** allows thousands of attempts without restriction.
+- **No Progressive Blocking:** no defense against repeated attempts.
 
 ---
 
-## Mitigación
+## Mitigation
 
-1. **Rate limiting:** limitar intentos de login por IP/usuario en una ventana temporal.
-2. **Bloqueo progresivo:** backoff o lockout tras varios intentos fallidos.
-3. **Política de contraseñas robusta:** prohibir contraseñas comunes o presentes en diccionarios filtrados.
-4. **MFA:** reducir el impacto aunque se comprometa la contraseña.
-5. **No revelar usuarios en la interfaz:** evitar pistas visuales o textos que indiquen usuarios válidos.
-6. **Logging y alertas:** detectar y alertar sobre intentos masivos de login.
+1. **Rate Limiting:** limit login attempts per IP/user in a time window.
+2. **Progressive Blocking:** backoff or lockout after several failed attempts.
+3. **Robust Password Policy:** prohibit common passwords or those in leaked dictionaries.
+4. **MFA:** reduce impact even if password is compromised.
+5. **Don't Reveal Users in the Interface:** avoid visual hints or text indicating valid users.
+6. **Logging and Alerts:** detect and alert on massive login attempts.

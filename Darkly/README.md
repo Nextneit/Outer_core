@@ -1,35 +1,35 @@
 # Darkly — Flags & Write-ups
 
-Documentación de las vulnerabilidades encontradas y explotadas en el reto **Darkly**, basado en el OWASP Top 10 (2017).
+Documentation of vulnerabilities found and exploited in the **Darkly** challenge, based on OWASP Top 10 (2017).
 
 ---
 
-## Índice
+## Index
 
-| # | Vulnerabilidad | Categoría OWASP | Write-up |
+| # | Vulnerability | OWASP Category | Write-up |
 |---|---|---|---|
-| 1 | SQL Injection (I) | A1 - Injection | [Ver](SQL_Injection/resources/README.md) |
-| 2 | SQL Injection (II) | A1 - Injection | [Ver](SQL_injection_II/resources/README.md) |
-| 3 | Broken Authentication (Reset Password) | A2 - Broken Authentication | [Ver](Broken_Authentication/resources/README.md) |
-| 4 | Broken Authentication (Cookie Manipulation) | A2 - Broken Authentication | [Ver](Cookie_Authentication/resources/README.md) |
-| 5 | Broken Authentication (Brute Force) | A2 - Broken Authentication | [Ver](Brute_Force_Authentication/resources/README.md) |
-| 6 | Insecure File Upload | A4 - Insecure Direct Object References | [Ver](Insecure_File_Upload/resources/README.md) |
-| 7 | Broken Access Control (Survey) | A5 - Broken Access Control | [Ver](Broken_Access_Control/resources/README.md) |
-| 8 | Open Redirect | A5 - Broken Access Control | [Ver](Open_Redirect/resources/README.md) |
-| 9 | HTTP Header Validation | A5 - Broken Access Control | [Ver](HTTP_Header_Validation/resources/README.md) |
-| 10 | Path Traversal | A5 - Broken Access Control | [Ver](Path_Trasversal/resources/README.md) |
-| 11 | Security Misconfiguration (.hidden) | A6 - Security Misconfiguration | [Ver](Security_Misgonfiguration/resources/README.md) |
-| 12 | Sensitive Data Exposure (Admin Credentials) | A6 - Sensitive Data Exposure | [Ver](Admin_Credentials/resources/README.md) |
-| 13 | Cross-Site Scripting (XSS) | A7 - XSS | [Ver](Cross-site_scripting/resources/README.md) |
-| 14 | Cross-Site Scripting via Data URI | A7 - XSS | [Ver](Cross-site_Scripting_via_Data_URI/resources/README.md) |
+| 1 | SQL Injection (I) | A1 - Injection | [View](SQL_Injection/resources/README.md) |
+| 2 | SQL Injection (II) | A1 - Injection | [View](SQL_injection_II/resources/README.md) |
+| 3 | Broken Authentication (Reset Password) | A2 - Broken Authentication | [View](Broken_Authentication/resources/README.md) |
+| 4 | Broken Authentication (Cookie Manipulation) | A2 - Broken Authentication | [View](Cookie_Authentication/resources/README.md) |
+| 5 | Broken Authentication (Brute Force) | A2 - Broken Authentication | [View](Brute_Force_Authentication/resources/README.md) |
+| 6 | Insecure File Upload | A4 - Insecure Direct Object References | [View](Insecure_File_Upload/resources/README.md) |
+| 7 | Broken Access Control (Survey) | A5 - Broken Access Control | [View](Broken_Access_Control/resources/README.md) |
+| 8 | Open Redirect | A5 - Broken Access Control | [View](Open_Redirect/resources/README.md) |
+| 9 | HTTP Header Validation | A5 - Broken Access Control | [View](HTTP_Header_Validation/resources/README.md) |
+| 10 | Path Traversal | A5 - Broken Access Control | [View](Path_Trasversal/resources/README.md) |
+| 11 | Security Misconfiguration (.hidden) | A6 - Security Misconfiguration | [View](Security_Misgonfiguration/resources/README.md) |
+| 12 | Sensitive Data Exposure (Admin Credentials) | A6 - Sensitive Data Exposure | [View](Admin_Credentials/resources/README.md) |
+| 13 | Cross-Site Scripting (XSS) | A7 - XSS | [View](Cross-site_scripting/resources/README.md) |
+| 14 | Cross-Site Scripting via Data URI | A7 - XSS | [View](Cross-site_Scripting_via_Data_URI/resources/README.md) |
 
 ---
 
-## Estructura del repositorio
+## Repository Structure
 
 ```
 Flags/
-├── README.md                          ← este archivo
+├── README.md                          ← this file
 ├── Admin_Credentials/
 │   ├── flag
 │   └── resources/README.md
@@ -67,7 +67,7 @@ Flags/
 │   ├── flag
 │   └── resources/
 │       ├── README.md
-│       ├── scraper.py          ← scraper playwright para enumerar .hidden
+│       ├── scraper.py          ← Playwright scraper to enumerate .hidden
 │       └── requirements.txt
 ├── SQL_Injection/
 │   ├── flag
@@ -79,7 +79,7 @@ Flags/
 
 ---
 
-## Referencias
+## References
 
 - [OWASP Top 10 (2017)](https://owasp.org/www-project-top-ten/2017/)
-- [Documentación completa del proyecto](https://dpavon-g.github.io/Darkly/)
+- [Complete Project Documentation](https://dpavon-g.github.io/Darkly/)

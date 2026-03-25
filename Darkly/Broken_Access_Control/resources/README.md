@@ -1,29 +1,29 @@
 # A5 - Broken Access Control
 
-Vulnerabilidad del OWASP Top 10 (2017). En el apartado `survey`, un formulario con un `<select>` limita los valores del 1 al 10 solo en el cliente. El servidor no valida que el valor recibido pertenezca a ese rango.
+OWASP Top 10 (2017) vulnerability. In the `survey` section, a form with a `<select>` limits values from 1 to 10 only on the client. The server does not validate that the received value belongs to that range.
 
 ---
 
-## Pasos para obtener la flag
+## Steps to Obtain the Flag
 
-### 1. Identificar el vector
+### 1. Identify the Vector
 
-El formulario envía un POST con el parámetro `valeur` restringido al rango 1-10 por el HTML, pero el servidor acepta cualquier valor sin validarlo.
+The form sends a POST with the `valeur` parameter restricted to the range 1-10 by HTML, but the server accepts any value without validation.
 
-### 2. Explotar
+### 2. Exploit
 
-**Opción A – DevTools:**
-1. F12 → inspeccionar el elemento `<select name="valeur">`.
-2. Modificar el value de una opción existente a `4218.19`.
-3. Seleccionarla y enviar el formulario → aparece la **flag**.
+**Option A – DevTools:**
+1. F12 → inspect the `<select name="valeur">` element.
+2. Change the value of an existing option to `4218.19`.
+3. Select it and submit the form → the **flag** appears.
 
-**Opción B – Burp Suite:**
-Interceptar el POST y cambiar el parámetro:
+**Option B – Burp Suite:**
+Intercept the POST and change the parameter:
 ```
 valeur=4218.19
 ```
 
-**Opción C – cURL:**
+**Option C – cURL:**
 ```bash
 curl -X POST "http://<IP>/index.php?page=survey" \
      -d "valeur=4218.19&sujet=1"
@@ -31,21 +31,21 @@ curl -X POST "http://<IP>/index.php?page=survey" \
 
 ---
 
-## Impacto
+## Impact
 
-- **Integridad:** el atacante modifica datos que no debería poder alterar.
-- **Confidencialidad:** mediante escalada de privilegios se accede a información restringida.
-- **Autorización débil:** confiar solo en validaciones del cliente es trivialmente eludible.
+- **Integrity:** the attacker modifies data they shouldn't be able to alter.
+- **Confidentiality:** through privilege escalation, access to restricted information.
+- **Weak Authorization:** trusting only client-side validation is trivially bypassable.
 
 ---
 
-## Mitigación
+## Mitigation
 
-1. **Validación en servidor con whitelist:**
+1. **Server-side validation with whitelist:**
    ```php
    $allowed = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-   if (!in_array($_POST['valeur'], $allowed)) die('Valor inválido');
+   if (!in_array($_POST['valeur'], $allowed)) die('Invalid value');
    ```
-2. **Nunca confiar en datos del cliente:** toda restricción de negocio debe aplicarse en el backend.
-3. **Principio de mínimo privilegio:** validar en cada request que la acción está permitida para ese usuario.
-4. **Logging:** registrar envíos con valores fuera del rango esperado.
+2. **Never trust client data:** every business logic restriction must be applied in the backend.
+3. **Principle of Least Privilege:** validate on each request that the action is allowed for that user.
+4. **Logging:** record submissions with values outside the expected range.

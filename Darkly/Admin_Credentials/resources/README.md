@@ -1,72 +1,72 @@
 # A6 - Sensitive Data Exposure (Admin Credentials)
 
-Vulnerabilidad del OWASP Top 10 (2017). Las credenciales de administrador están expuestas en un archivo accesible públicamente, descubierto a través del `robots.txt` del servidor.
+OWASP Top 10 (2017) vulnerability. Admin credentials are exposed in a publicly accessible file, discovered through the server's `robots.txt`.
 
 ---
 
-## Pasos para obtener la flag
+## Steps to Obtain the Flag
 
-### 1. Reconocimiento
+### 1. Reconnaissance
 
-El escaneo con nmap revela dos rutas en `robots.txt`:
+Scanning with nmap reveals two routes in `robots.txt`:
 ```
 /whatever
 /.hidden
 ```
 
-Estas rutas intentan ocultarse de motores de búsqueda, pero son accesibles sin autenticación.
+These routes attempt to hide from search engines, but are accessible without authentication.
 
-### 2. Acceder a `/whatever`
+### 2. Access `/whatever`
 
 ```
 http://<IP>/whatever/
 ```
 
-El directorio contiene un archivo con credenciales en texto plano:
+The directory contains a file with plain text credentials:
 ```
 root:437394baff5aa33daa618be47b75cb49
 ```
 
-### 3. Descifrar la contraseña
+### 3. Decrypt the Password
 
-El hash `437394baff5aa33daa618be47b75cb49` es MD5 → descifra a `qwerty123@`.
+The hash `437394baff5aa33daa618be47b75cb49` is MD5 → decrypts to `qwerty123@`.
 
-> Herramienta: [md5decrypt.net](https://md5decrypt.net/en/)
+> Tool: [md5decrypt.net](https://md5decrypt.net/en/)
 
-### 4. Acceder al panel de administración
+### 4. Access the Admin Panel
 
-1. Navegar a `http://<IP>/admin`
-2. Introducir las credenciales:
-   - **Usuario:** `root`
-   - **Contraseña:** `qwerty123@`
-3. Acceso concedido → se muestra la **flag**.
+1. Navigate to `http://<IP>/admin`
+2. Enter the credentials:
+   - **Username:** `root`
+   - **Password:** `qwerty123@`
+3. Access granted → the **flag** is displayed.
 
 ---
 
-## Flujo del ataque
+## Attack Flow
 
 ```
-Nmap → robots.txt → /whatever → credenciales → /admin → flag
+Nmap → robots.txt → /whatever → credentials → /admin → flag
 ```
 
 ---
 
-## Impacto
+## Impact
 
-- **Exposición de credenciales:** contraseñas almacenadas en archivos públicos.
-- **Cifrado débil:** MD5 es trivialmente reversible con rainbow tables.
-- **robots.txt como pista:** listar rutas sensibles en `robots.txt` las hace más obvias para atacantes.
-- **Compromiso total:** acceso completo al panel administrativo.
+- **Credential Exposure:** passwords stored in public files.
+- **Weak Encryption:** MD5 is trivially reversible with rainbow tables.
+- **robots.txt as a Clue:** listing sensitive routes in `robots.txt` makes them obvious to attackers.
+- **Complete Compromise:** full access to the admin panel.
 
 ---
 
-## Mitigación
+## Mitigation
 
-1. **Nunca almacenar credenciales en archivos dentro del webroot.**
-2. **Usar hashing fuerte:** `password_hash($pass, PASSWORD_ARGON2ID)` en lugar de MD5.
-3. **No listar recursos sensibles en `robots.txt`:** protegerlos con autenticación real, no intentar ocultarlos.
-4. **Usar variables de entorno** para secretos en lugar de hardcodearlos.
-5. **Auditorías regulares:** buscar archivos `.txt`, `.bak`, `.old` expuestos en el webroot.
+1. **Never store credentials in files within the webroot.**
+2. **Use strong hashing:** `password_hash($pass, PASSWORD_ARGON2ID)` instead of MD5.
+3. **Don't list sensitive resources in `robots.txt`:** protect them with real authentication, not by hiding them.
+4. **Use environment variables** for secrets instead of hardcoding them.
+5. **Regular Audits:** search for exposed `.txt`, `.bak`, `.old` files in the webroot.
    ```bash
    find /var/www/html -name "*.txt" -o -name "*.bak" -o -name "*.old"
    ```

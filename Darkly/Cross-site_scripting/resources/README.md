@@ -1,18 +1,18 @@
 # A7 - Cross-Site Scripting (XSS)
 
-Vulnerabilidad del OWASP Top 10 (2017). El formulario de feedback valida la entrada solo en el cliente (JavaScript). El servidor no sanitiza la entrada, permitiendo inyectar código JavaScript que se ejecuta en el navegador.
+OWASP Top 10 (2017) vulnerability. The feedback form validates input only on the client (JavaScript). The server does not sanitize the input, allowing JavaScript code injection that executes in the browser.
 
 ---
 
-## Pasos para obtener la flag
+## Steps to Obtain the Flag
 
-### 1. Identificar el vector
+### 1. Identify the Vector
 
-El formulario de feedback tiene una validación en cliente con `validate_form()`. Esta validación es trivialmente eludible sin tocar el servidor.
+The feedback form has client-side validation with `validate_form()`. This validation is trivially bypassable without touching the server.
 
-### 2. Explotar
+### 2. Exploit
 
-**Opción A – Anular la validación desde la consola (F12):**
+**Option A – Bypass Validation from Console (F12):**
 ```js
 function validate_form(thisform) {
     with (thisform) {
@@ -23,41 +23,41 @@ function validate_form(thisform) {
     }
 }
 ```
-Tras redefinir la función, enviar el formulario con cualquier payload (ej. `<script>alert("XSS")</script>`) → el servidor devuelve la **flag**.
+After redefining the function, submit the form with any payload (e.g., `<script>alert("XSS")</script>`) → the server returns the **flag**.
 
-**Opción B – Burp Suite:**
-Interceptar el POST y enviar directamente:
+**Option B – Burp Suite:**
+Intercept the POST and send directly:
 ```
 txtName=<script>alert("XSS")</script>&mtxtMessage=test
 ```
 
-### 3. Por qué funciona
+### 3. Why It Works
 
-La validación cliente es fácilmente eludible. El servidor no aplica ningún `htmlspecialchars`, escape ni filtrado sobre los datos recibidos, por lo que el payload se procesa y la flag se muestra.
+Client-side validation is easily bypassable. The server applies no `htmlspecialchars`, escaping, or filtering on received data, so the payload is processed and the flag is displayed.
 
-> **Nota:** El código HTML usa `mtxtMessage` como nombre del textarea, pero el JS referencia `mtxMessage` (sin la `t`). Este bug hace que la validación falle internamente, lo que en la práctica también permite bypassearla sin modificar nada.
-
----
-
-## Impacto
-
-- **Robo de cookies/sesión:** `document.cookie` expuesto a atacantes.
-- **Phishing:** inyección de formularios falsos para capturar credenciales.
-- **Redirección maliciosa:** enviar usuarios a sitios de phishing.
-- **Acciones en nombre del usuario:** peticiones autenticadas sin conocimiento del usuario.
+> **Note:** The HTML code uses `mtxtMessage` as the textarea name, but the JS references `mtxMessage` (without the `t`). This bug causes validation to fail internally, which in practice also allows bypassing it without modifying anything.
 
 ---
 
-## Mitigación
+## Impact
 
-1. **Sanitizar en servidor:**
+- **Cookie/Session Theft:** `document.cookie` exposed to attackers.
+- **Phishing:** injection of fake forms to capture credentials.
+- **Malicious Redirection:** sending users to phishing sites.
+- **Actions on Behalf of User:** authenticated requests without user knowledge.
+
+---
+
+## Mitigation
+
+1. **Sanitize on Server:**
    ```php
    $feedback = htmlspecialchars($_POST['feedback'], ENT_QUOTES, 'UTF-8');
    ```
-2. **Usar librerías de sanitización** (ej. HTML Purifier) para contenido enriquecido.
+2. **Use Sanitization Libraries** (e.g., HTML Purifier) for rich content.
 3. **Content Security Policy (CSP):**
    ```html
    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
    ```
-4. **Nunca confiar en validaciones del cliente** para seguridad; son solo para UX.
-5. **Frameworks modernos:** usar templating engines que escapen automáticamente el output.
+4. **Never Trust Client-side Validation** for security; it's only for UX.
+5. **Modern Frameworks:** use templating engines that automatically escape output.
