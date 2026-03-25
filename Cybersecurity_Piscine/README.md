@@ -1,0 +1,343 @@
+# Cybersecurity Piscine
+
+Collection of practical cybersecurity exercises. Each project explores different areas: from web scraping and image forensics, to cryptography and authentication.
+
+---
+
+## Contents
+
+| Project | Area | Description |
+|---|---|---|
+| [Arachnida](#arachnida) | Web Scraping & Forensics | Web scraper for images + EXIF metadata extractor |
+| [ft_otp](#ft_otp) | Cryptography | TOTP (One-Time Password) generator from scratch |
+
+---
+
+## Arachnida
+
+**Path:** [`Arachnida/`](Arachnida/)
+**Documentation:** [README](Arachnida/README.md)
+
+Suite of two specialized tools for web analysis and image forensics.
+
+### Exercise 00: Spider
+
+Recursive web scraper that downloads images from a specified URL.
+
+**Features:**
+- ✅ Downloads images in formats `.jpg`, `.png`, `.gif`, `.bmp`
+- ✅ Recursive scraping with depth control (`-l`)
+- ✅ Domain filtering (only downloads from specified domain)
+- ✅ Respects `robots.txt`
+- ✅ Configurable User-Agent
+- ✅ Error handling and retries
+
+**Flags:**
+```bash
+spider -r              # Enable recursive scraping
+spider -l LEVEL        # Maximum depth (default: 2)
+spider -p PATH         # Output directory (default: ./data/)
+```
+
+**Example:**
+```bash
+python3 spider.py https://example.com -r -l 2 -p ./images/
+```
+
+### Exercise 01: Scorpion
+
+EXIF metadata and file attribute extractor for local images.
+
+**Features:**
+- ✅ EXIF metadata extraction (date, camera, GPS, etc.)
+- ✅ File information (size, permissions, timestamps)
+- ✅ Metadata stripping (`--strip`)
+- ✅ Save cleaned images
+- ✅ Support for `.jpg`, `.png`, `.gif`, `.bmp`
+
+**Flags:**
+```bash
+scorpion image.jpg                    # Show metadata
+scorpion image.jpg --strip            # Remove metadata
+scorpion image.jpg --strip --out out/ # Save cleaned image
+```
+
+**Example:**
+```bash
+python3 scorpion.py photo.jpg
+python3 scorpion.py photo.jpg --strip --out ./cleaned/
+```
+
+### Run Tests
+
+```bash
+cd Arachnida
+make install    # Install dependencies
+make test       # Run complete test suite
+make clean      # Clean environment
+```
+
+**Dependencies:**
+- [`requests`](https://requests.readthedocs.io/) — HTTP client
+- [`BeautifulSoup4`](https://www.crummy.com/software/BeautifulSoup/) — HTML parsing
+- [`Pillow`](https://python-pillow.org/) — Image processing
+- [`piexif`](https://piexif.readthedocs.io/) — EXIF manipulation
+
+---
+
+## ft_otp
+
+**Path:** [`ft_otp/`](ft_otp/)
+**Documentation:** [README](ft_otp/README.md)
+
+**TOTP** (Time-based One-Time Password) generator implemented from scratch, without using external cryptography libraries (only `hmac`, `hashlib`, `struct` from stdlib).
+
+### Concept
+
+TOTP is an algorithm that generates 6-digit codes that change every 30 seconds. It's used in two-factor authentication (2FA) in applications like Google, GitHub, AWS, etc.
+
+**Theoretical Foundation:**
+- **RFC 4226:** HOTP algorithm specification (counter-based)
+- **RFC 6238:** Extension to TOTP (time-based)
+- **HMAC-SHA1:** Underlying cryptographic hash function
+
+### Operations
+
+#### `-g KEYFILE` — Save encrypted key
+
+Reads a hexadecimal key from a file and encrypts it with **Fernet** (AES-128-CBC + HMAC-SHA256).
+
+**Requirements:**
+- File must contain exactly **64+ hexadecimal characters** (0-9, a-f, A-F)
+- Whitespace and newlines are ignored
+
+**Example:**
+```bash
+echo "c42c3cc306414141592f772691f47fbf4d2c2263ae34e7b4b9137d128d6d2a7d" > key.hex
+python3 ft_otp.py -g key.hex
+```
+
+**Output:**
+```
+Key was successfully saved in ft_otp.key
+```
+
+#### `-k [KEYFILE]` — Generate TOTP
+
+Reads the encrypted key and generates a 6-digit OTP code based on the current time.
+
+**Default:** If no file is specified, uses `ft_otp.key`
+
+**Example:**
+```bash
+python3 ft_otp.py -k
+# Output: 534144
+
+# (wait 30+ seconds)
+python3 ft_otp.py -k
+# Output: 228629 (different)
+```
+
+### Automated Execution
+
+The project includes a **complete Makefile** for automation:
+
+```bash
+make              # Generates random hex key and encrypts it
+make run          # Generates TOTP from saved key
+make test         # Complete validation suite
+make re           # Clean and rebuild from scratch
+make clean        # Remove all generated files
+make help         # Show all available targets
+```
+
+### Key Management
+
+#### Persistent Fernet Key
+
+On first execution, `ft_otp.fernet` is automatically generated, which acts as the master key for encrypting/decrypting TOTP keys.
+
+```
+First execution:
+  → Generates ft_otp.fernet (auto)
+  → Creates ft_otp.key (encrypted)
+
+Subsequent executions:
+  → Loads existing ft_otp.fernet
+  → Decrypts ft_otp.key correctly
+```
+
+⚠️ **Important:**
+- Do NOT commit `ft_otp.fernet` or `ft_otp.key` to repository
+- Losing `ft_otp.fernet` = losing access to all saved keys
+- Keep secure backup of `ft_otp.fernet`
+
+### File Structure
+
+```
+ft_otp/
+├── ft_otp.py          # Main script
+├── requirements.txt   # Dependencies (cryptography)
+├── Makefile          # Complete automation
+├── README.md         # Detailed documentation
+├── key.hex           # Source hex key (generated by make)
+├── ft_otp.key        # Encrypted key (generated by -g)
+├── ft_otp.fernet     # Master key (auto-generated)
+└── .venv/            # Virtual environment (created by make)
+```
+
+### Testing
+
+```bash
+cd ft_otp
+make test        # Run all tests
+make test-gen    # Test key generation
+make test-totp   # Test OTP generation
+make test-invalid-short  # Validate input rejection
+make test-invalid-hex    # Validate input rejection
+```
+
+### TOTP Algorithm
+
+Step-by-step implementation:
+
+```
+1. Counter = floor(UNIX_TIMESTAMP / 30)
+2. HMAC = HMAC-SHA1(key_bytes, counter_big_endian_8bytes)
+3. Offset = HMAC[-1] & 0x0F (dynamic)
+4. Code = (HMAC[offset:offset+4] & 0x7FFFFFFF) % 1_000_000
+5. Output = zero-padded to 6 digits
+```
+
+**Properties:**
+- ✅ Deterministic: same code for same time and key
+- ✅ Time-based: code changes every 30 seconds
+- ✅ Synchronizable: compatible with Google Authenticator, Authy, etc.
+
+### Verify with oathtool
+
+Compare with standard `oathtool` tool:
+
+```bash
+# Convert hex to base32
+KEY_B32=$(python3 -c "import sys; print(__import__('base64').b32encode(bytes.fromhex('$HEX_KEY')).decode().strip('='))")
+
+# Compare outputs
+oathtool --totp "$KEY_B32"    # Standard
+python3 ft_otp.py -k         # Our implementation
+
+# Should be identical within the same 30-second period
+```
+
+### Dependencies
+
+```
+cryptography >= 3.4
+```
+
+Install with:
+```bash
+make install
+# or
+pip install cryptography
+```
+
+---
+
+## Key Concepts
+
+### Cryptography in Arachnida
+- **EXIF Extraction:** Analysis of digital image metadata
+- **Data Security:** Importance of cleaning metadata before sharing images
+
+### Cryptography in ft_otp
+- **HMAC:** Data authentication method
+- **TOTP:** Time-synchronized one-time passwords
+- **Fernet Encryption:** Symmetric AES + HMAC for authenticity
+- **Secret Management:** Secure storage of cryptographic keys
+
+---
+
+## Recommended Workflow
+
+### Arachnida
+
+```bash
+cd Arachnida
+make install           # Setup (one time)
+
+# Use Spider
+python3 ex00/spider.py https://example.com -p ./images/
+
+# Use Scorpion
+python3 ex01/scorpion.py ./images/photo.jpg
+python3 ex01/scorpion.py ./images/photo.jpg --strip --out ./cleaned/
+```
+
+### ft_otp
+
+```bash
+cd ft_otp
+make              # Generates random key and encrypts it
+make run          # Generates TOTP (6-digit code)
+
+# Or manually
+echo "c42c3cc306414141...7d2a7d" > key.hex
+python3 ft_otp.py -g key.hex
+python3 ft_otp.py -k
+```
+
+---
+
+## References
+
+### Arachnida
+- [Requests Documentation](https://requests.readthedocs.io/)
+- [BeautifulSoup Documentation](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
+- [EXIF Specification](https://en.wikipedia.org/wiki/Exif)
+- [robots.txt Standard](https://www.robotstxt.org/)
+
+### ft_otp
+- [RFC 4226: HOTP Algorithm](https://tools.ietf.org/html/rfc4226)
+- [RFC 6238: TOTP Algorithm](https://tools.ietf.org/html/rfc6238)
+- [Fernet (cryptography.io)](https://cryptography.io/en/latest/fernet/)
+- [HMAC Wikipedia](https://en.wikipedia.org/wiki/HMAC)
+
+---
+
+## Troubleshooting
+
+### Arachnida
+
+**Q: "ModuleNotFoundError: No module named 'requests'"**
+```bash
+make install
+```
+
+**Q: "SSL Certificate Error"**
+- Some sites may require special headers
+- Adjust User-Agent in code if necessary
+
+### ft_otp
+
+**Q: "error: failed to load key"**
+- Delete `ft_otp.fernet` and regenerate:
+```bash
+rm ft_otp.fernet
+python3 ft_otp.py -k
+```
+
+**Q: "key must be 64 hexadecimal characters"**
+- Verify file has exactly 64 hex characters
+- No spaces, newlines, or special characters
+
+---
+
+## Next Steps
+
+Upcoming exercises planned for Cybersecurity Piscine:
+- Inquisitor (log analysis)
+- Vaccine (malware analysis)
+- Stockholm (symmetric encryption)
+- Iron Dome (intrusion detection)
+- Reverse Engineering
