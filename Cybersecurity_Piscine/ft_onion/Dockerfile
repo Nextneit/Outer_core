@@ -28,4 +28,4 @@ RUN mkdir -p /var/lib/tor/hidden_service && \
 EXPOSE 4242
 EXPOSE 80
 
-CMD ["./scripts/init.sh"]
+CMD ["/scripts/init.sh"]
