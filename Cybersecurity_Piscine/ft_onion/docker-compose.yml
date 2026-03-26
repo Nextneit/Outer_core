@@ -1,5 +1,6 @@
 services:
   ft_onion:
+    container_name: ft_onion
     build: .
     ports:
       - "8080:80"
