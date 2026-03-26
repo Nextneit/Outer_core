@@ -1,0 +1,7 @@
+services:
+  ft_onion:
+    build: .
+    ports:
+      - "8080:80"
+      - "2222:4242"
+    restart: unless-stopped
