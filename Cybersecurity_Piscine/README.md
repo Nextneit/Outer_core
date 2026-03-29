@@ -10,6 +10,8 @@ Collection of practical cybersecurity exercises. Each project explores different
 |---|---|---|
 | [Arachnida](#arachnida) | Web Scraping & Forensics | Web scraper for images + EXIF metadata extractor |
 | [ft_otp](#ft_otp) | Cryptography | TOTP (One-Time Password) generator from scratch |
+| [ft_onion](#ft_onion) | Networking / Docker | Tor hidden service deployment with SSH access |
+| [Reverse_me_i'm_famous!](#reverse_me_im_famous) | Reverse Engineering | Binary reverse engineering with GDB (3 levels: 32-bit → 64-bit) |
 
 ---
 
@@ -244,6 +246,131 @@ pip install cryptography
 
 ---
 
+## ft_onion
+
+**Path:** [`ft_onion/`](ft_onion/)
+**Documentation:** [README](ft_onion/README.md)
+
+**Tor hidden service deployment** exposing a static web page over HTTP and accessible via SSH, fully containerized with Docker.
+
+### Overview
+
+Deploys three services inside a single Docker container:
+
+| Service | Internal Port | External Port | Description |
+|---------|---------------|---------------|-------------|
+| **Nginx** | `80` | — | Serves static web page (Tor only) |
+| **Tor** | — | — | Exposes web as `.onion` hidden service |
+| **OpenSSH** | `4242` | `2222` | Remote container access |
+
+> **Access:** Nginx is not exposed directly to the host. Web access is exclusively through Tor network via the `.onion` address.
+
+### Quick Start
+
+```bash
+make start          # Build and start container
+make check          # Get .onion address (wait 30-60s for Tor bootstrap)
+make test-ssh       # Test SSH: user42 / password
+make test-web       # Test web server
+make stop           # Stop container
+make clean          # Clean everything
+```
+
+### Technologies
+
+- **Docker & Docker Compose** — Containerization
+- **Tor** — Onion routing and hidden services
+- **Nginx** — Web server
+- **OpenSSH** — Secure shell access
+
+### Learning Objectives
+
+- ✅ Docker multi-service deployment
+- ✅ Tor network fundamentals and `.onion` services
+- ✅ Container networking and port mapping
+- ✅ SSH configuration in containers
+- ✅ Network security and anonymity concepts
+
+---
+
+## Reverse_me_i'm_famous!
+
+**Path:** [`Reverse_me_i'm_famous!/`](Reverse_me_i'm_famous!/)
+**Documentation:** [README](Reverse_me_i'm_famous!/README.md)
+
+**Reverse Engineering Challenge** consisting of 3 binary analysis exercises with increasing difficulty. Learn to use GDB for dynamic analysis, disassembly, and software reconstruction.
+
+### Overview
+
+Three compiled binaries to reverse engineer and find hidden keys:
+
+| Level | Arch | Difficulty | Objective |
+|-------|------|------------|-----------|
+| **Level 1** | x86 32-bit | ⭐ Beginner | Find hardcoded key using `strcmp` breakpoint |
+| **Level 2** | x86 32-bit | ⭐⭐ Intermediate | Decode algorithm: input validation + decimal-to-ASCII transformation |
+| **Level 3** | x86-64 | ⭐⭐⭐ Advanced | 64-bit analysis with complex validation logic and control flow obfuscation |
+
+### Quick Start
+
+```bash
+cd Reverse_me_i'm_famous!/level1
+
+# Reconnaissance
+file binary/level1
+strings binary/level1 | grep -E "(Good|Nope)"
+
+# Dynamic analysis with GDB
+gdb ./binary/level1
+(gdb) disas main
+(gdb) break strcmp
+(gdb) run
+(gdb) x/s $esp    # Inspect stack memory
+```
+
+### Learning Objectives
+
+- ✅ Binary anatomy (ELF headers, segments, symbols)
+- ✅ x86 and x86-64 assembly reading
+- ✅ GDB usage for dynamic debugging
+- ✅ Calling conventions (cdecl on 32-bit, System V on 64-bit)
+- ✅ Identifying obfuscation techniques (hardcoding, false function names, control flow complexity)
+- ✅ Reconstructing source code from binary
+- ✅ Understanding algorithm transformation (validation → encoding)
+
+### Tools
+
+```bash
+gdb              # Primary debugger
+strings          # Extract text from binary
+objdump          # Disassemble and analyze
+readelf          # Read ELF headers
+strace / ltrace  # Trace syscalls and library calls
+radare2          # Interactive analysis (alternative)
+```
+
+### Key Concepts
+
+**Level 1:**
+- Stack layout in 32-bit (`ESP`, `EBP`)
+- cdecl calling convention (arguments on stack)
+- Basic string functions: `printf`, `scanf`, `strcmp`
+- Hardcoded data in executable
+
+**Level 2:**
+- Input validation (format checking with specific prefixes)
+- Algorithmic transformation (decimal string → ASCII bytes)
+- Loop analysis and reconstruction  
+- Obfuscation: noise strings, meaningless variable names
+
+**Level 3:**
+- x86-64 registers (`RAX`, `RDI`, `RSI`, etc.)
+- System V AMD64 ABI (arguments in registers)
+- PIE (Position Independent Executable)
+- Complex control flow (switches with multiple cases)
+- Deliberate obfuscation: fake function names (`___syscall_malloc` vs `____syscall_malloc`)
+
+---
+
 ## Key Concepts
 
 ### Cryptography in Arachnida
@@ -255,6 +382,13 @@ pip install cryptography
 - **TOTP:** Time-synchronized one-time passwords
 - **Fernet Encryption:** Symmetric AES + HMAC for authenticity
 - **Secret Management:** Secure storage of cryptographic keys
+
+### Reverse Engineering in Reverse_me_i'm_famous!
+- **Binary Analysis:** Understanding compiled code structure (ELF format)
+- **Assembly Language:** Reading and interpreting x86/x86-64 instructions
+- **Dynamic Debugging:** Using GDB to trace execution and inspect memory
+- **Code Obfuscation:** Identifying and bypassing anti-analysis techniques
+- **Algorithm Reconstruction:** Converting binary to high-level source code
 
 ---
 
