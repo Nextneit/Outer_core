@@ -10,6 +10,8 @@ Collection of low-level, security, and systems projects. Each folder is an indep
 |---|---|---|
 | [Cybersecurity_Piscine/Arachnida](#arachnida) | Cybersecurity | Web scraper for images + EXIF metadata extractor |
 | [Cybersecurity_Piscine/ft_otp](#ft_otp) | Cybersecurity | TOTP (One-Time Password) generator from scratch |
+| [Cybersecurity_Piscine/ft_onion](#ft_onion) | Cybersecurity | Tor hidden service with SSH access (Docker) |
+| [Cybersecurity_Piscine/Reverse_me_i'm_famous!](#reverse_me_im_famous) | Cybersecurity | Reverse engineering binaries with GDB (3 levels: 32-bit → 64-bit) |
 | [Darkly](#darkly) | Cybersecurity | CTF with web vulnerabilities (OWASP Top 10) |
 | [dr-quine](#dr-quine) | Theoretical Recreation | Programs that print their own source code (quines) |
 | [ft_ping](#ft_ping) | Networking / C | Reimplementation of `ping` command with raw sockets |
@@ -58,6 +60,58 @@ make test         # Complete validation suite
 ```
 
 **Technologies:** Python 3, `cryptography` (Fernet)
+
+---
+
+## Cybersecurity_Piscine/ft_onion
+
+**Path:** [`Cybersecurity_Piscine/ft_onion/`](Cybersecurity_Piscine/ft_onion/)
+**Documentation:** [README](Cybersecurity_Piscine/ft_onion/README.md)
+
+**Tor hidden service deployment** with SSH access, fully containerized with Docker.
+
+- Deploys **3 services**: Nginx (web server), Tor (hidden service), OpenSSH (remote access)
+- Exposes a static web page exclusively via `.onion` address
+- SSH access available on port `2222` (credentials: `user42` / `password`)
+- Multi-service Docker Compose setup with automatic Tor bootstrap
+
+**Quick Start:**
+```bash
+make start          # Build and start
+make check          # Get .onion address
+make test-ssh       # Test SSH access
+make test-web       # Test web server
+make stop           # Stop container
+```
+
+**Technologies:** Docker, Docker Compose, Tor, Nginx, OpenSSH
+
+---
+
+## Cybersecurity_Piscine/Reverse_me_i'm_famous!
+
+**Path:** [`Cybersecurity_Piscine/Reverse_me_i'm_famous!/`](Cybersecurity_Piscine/Reverse_me_i'm_famous!/)
+**Documentation:** [README](Cybersecurity_Piscine/Reverse_me_i'm_famous!/README.md)
+
+**Reverse Engineering Challenge** with 3 binary analysis exercises:
+
+- **Level 1** (x86 32-bit, ⭐ Beginner) — Find hardcoded key inside executable using GDB
+- **Level 2** (x86 32-bit, ⭐⭐ Intermediate) — Reverse decode algorithm: input format validation + decimal-to-ASCII transformation
+- **Level 3** (x86-64, ⭐⭐⭐ Advanced) — Analyze 64-bit code with obfuscated control flow and fake function names
+
+**Concepts:** Binary anatomy (ELF), x86/x86-64 assembly, GDB debugging, calling conventions, code obfuscation, source reconstruction
+
+**Quick Start:**
+```bash
+cd Cybersecurity_Piscine/Reverse_me_i\'m_famous\!/level1
+file binary/level1
+gdb ./binary/level1
+(gdb) disas main
+(gdb) break strcmp
+(gdb) run
+```
+
+**Technologies:** GDB, x86/x86-64 assembly, ELF format analysis
 
 ---
 
