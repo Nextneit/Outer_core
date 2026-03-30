@@ -594,6 +594,4 @@ python3 ft_otp.py -k
 Upcoming exercises planned for Cybersecurity Piscine:
 - Inquisitor (log analysis)
 - Vaccine (malware analysis)
-- Stockholm (symmetric encryption)
 - Iron Dome (intrusion detection)
-- Reverse Engineering
