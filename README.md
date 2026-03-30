@@ -8,11 +8,11 @@ Collection of low-level, security, and systems projects. Each folder is an indep
 
 | Project | Area | Brief Description |
 |---|---|---|
-| [Cybersecurity_Piscine/Arachnida](#arachnida) | Cybersecurity | Web scraper for images + EXIF metadata extractor |
-| [Cybersecurity_Piscine/ft_otp](#ft_otp) | Cybersecurity | TOTP (One-Time Password) generator from scratch |
-| [Cybersecurity_Piscine/ft_onion](#ft_onion) | Cybersecurity | Tor hidden service with SSH access (Docker) |
-| [Cybersecurity_Piscine/Stockholm](#stockholm) | Cybersecurity | Educational ransomware simulator with Fernet encryption |
-| [Cybersecurity_Piscine/Reverse_me_i'm_famous!](#reverse_me_im_famous) | Cybersecurity | Reverse engineering binaries with GDB (3 levels: 32-bit → 64-bit) |
+| [Cybersecurity_Piscine/Arachnida](#cybersecurity_piscinearachnida) | Cybersecurity | Web scraper for images + EXIF metadata extractor |
+| [Cybersecurity_Piscine/ft_otp](#cybersecurity_piscineft_otp) | Cybersecurity | TOTP (One-Time Password) generator from scratch |
+| [Cybersecurity_Piscine/ft_onion](#cybersecurity_piscineft_onion) | Cybersecurity | Tor hidden service with SSH access (Docker) |
+| [Cybersecurity_Piscine/Stockholm](#cybersecurity_piscinestockholm) | Cybersecurity | Educational ransomware simulator with Fernet encryption |
+| [Cybersecurity_Piscine/Reverse_me_i'm_famous!](#cybersecurity_piscinereverse_me_im_famous) | Cybersecurity | Reverse engineering binaries with GDB (3 levels: 32-bit → 64-bit) |
 | [Darkly](#darkly) | Cybersecurity | CTF with web vulnerabilities (OWASP Top 10) |
 | [dr-quine](#dr-quine) | Theoretical Recreation | Programs that print their own source code (quines) |
 | [ft_ping](#ft_ping) | Networking / C | Reimplementation of `ping` command with raw sockets |
@@ -110,6 +110,7 @@ make stop           # Stop container
 
 **Quick Start:**
 ```bash
+cd Cybersecurity_Piscine/Stockholm
 make start          # Build and start container
 make create-files   # Generate test files
 make test           # Run encryption
