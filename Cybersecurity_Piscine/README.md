@@ -11,6 +11,7 @@ Collection of practical cybersecurity exercises. Each project explores different
 | [Arachnida](#arachnida) | Web Scraping & Forensics | Web scraper for images + EXIF metadata extractor |
 | [ft_otp](#ft_otp) | Cryptography | TOTP (One-Time Password) generator from scratch |
 | [ft_onion](#ft_onion) | Networking / Docker | Tor hidden service deployment with SSH access |
+| [Stockholm](#stockholm) | Cryptography / Ransomware | Educational ransomware simulator with Fernet encryption |
 | [Reverse_me_i'm_famous!](#reverse_me_im_famous) | Reverse Engineering | Binary reverse engineering with GDB (3 levels: 32-bit → 64-bit) |
 
 ---
@@ -290,6 +291,127 @@ make clean          # Clean everything
 - ✅ Container networking and port mapping
 - ✅ SSH configuration in containers
 - ✅ Network security and anonymity concepts
+
+---
+
+## Stockholm
+
+**Path:** [`Stockholm/`](Stockholm/)
+**Documentation:** [README](Stockholm/README.md)
+
+**Educational ransomware simulator** demonstrating file encryption/decryption using **Fernet symmetric encryption**. Simulates WannaCry-style file targeting (100+ file extensions) in a containerized environment.
+
+### Overview
+
+Stockholm encrypts files in `~/infection` with **Fernet (AES-128 + HMAC-SHA256)** and generates an encryption key saved automatically to the script directory. Decryption requires the same key.
+
+**Targeted File Types:** 100+ extensions (documents, spreadsheets, images, archives, code, databases, media, videos)
+
+### Quick Start
+
+```bash
+make start          # Build and start container
+make create-files   # Create sample test files (.txt, .json)
+make test           # Run encryption automatically
+make bash           # Enter container for manual testing
+```
+
+### Usage
+
+Inside the container:
+
+```bash
+# Encrypt files in ~/infection (auto-generates stockholm.key)
+stockholm
+
+# Decrypt files using saved key file
+stockholm -r stockholm.key
+
+# Or decrypt with key as argument
+stockholm -r "CtSKTRWI0nHfQoXO1cGXWcaVyZgkrs3fX3jfPL2vZRY="
+
+# Show help
+stockholm -h
+
+# Show version
+stockholm -v
+```
+
+### Operations
+
+| Flag | Description |
+|------|-------------|
+| `stockholm` | Encrypt all eligible files in `~/infection` |
+| `-r KEY\|FILE` | Decrypt; accepts key string or path to `stockholm.key` |
+| `-s, --silent` | Run without output |
+| `-h, --help` | Show help message |
+| `-v, --version` | Show version |
+
+### Key Features
+
+- ✅ **Fernet encryption** (symmetric, authenticated)
+- ✅ **Automatic key generation** — saved to `stockholm.key` alongside script
+- ✅ **100+ file extensions** — targets common document and media types
+- ✅ **Recursive directory traversal** — scans all subdirectories
+- ✅ **Dual-mode key loading** — accepts key file path or literal string
+- ✅ **Non-destructive** — original files renamed with `.ft` extension
+- ✅ **Docker Compose setup** — run in isolated, reproducible environment
+- ✅ **Volume mapping to host** — encrypted files visible in `./src/`
+
+### File Encryption Flow
+
+```
+original_file.txt → [Encrypt] → original_file.txt.ft (encrypted)
+                                 stockholm.key (saved)
+```
+
+### Decryption Flow
+
+```
+original_file.txt.ft → [Decrypt using stockholm.key] → original_file.txt
+```
+
+### Makefile Targets
+
+```bash
+make help           # Show all targets
+make start          # Build and start container
+make stop           # Stop container (keeps volumes)
+make down           # Stop and remove container
+make clean          # Remove container, images, and volumes
+make bash           # Open interactive shell in container
+make create-files   # Generate test files in ~/infection
+make test           # Create files and run encryption
+make logs           # Stream container logs
+```
+
+### Docker Setup
+
+Files are synchronized via **volume mapping**:
+
+```yaml
+volumes:
+  - ./stockholm.py:/usr/local/bin/stockholm  # Script as command
+  - ./src:/root/infection                     # Files visible on host
+```
+
+Result: Encrypted files appear in `./src/` directory on the host in real-time.
+
+### Technologies
+
+- **Python 3** — Implementation language
+- **cryptography.fernet** — Encryption backend
+- **Docker & Docker Compose** — Containerization
+
+### Learning Objectives
+
+- ✅ Symmetric encryption and key management
+- ✅ File I/O and directory traversal
+- ✅ Docker containerization and volume mapping
+- ✅ Command-line argument parsing in Python
+- ✅ Ransomware mechanics (for educational purposes)
+
+> ⚠️ **Disclaimer:** This is an educational project demonstrating encryption concepts. Not for malicious use.
 
 ---
 
