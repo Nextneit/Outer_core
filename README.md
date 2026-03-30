@@ -11,6 +11,7 @@ Collection of low-level, security, and systems projects. Each folder is an indep
 | [Cybersecurity_Piscine/Arachnida](#arachnida) | Cybersecurity | Web scraper for images + EXIF metadata extractor |
 | [Cybersecurity_Piscine/ft_otp](#ft_otp) | Cybersecurity | TOTP (One-Time Password) generator from scratch |
 | [Cybersecurity_Piscine/ft_onion](#ft_onion) | Cybersecurity | Tor hidden service with SSH access (Docker) |
+| [Cybersecurity_Piscine/Stockholm](#stockholm) | Cybersecurity | Educational ransomware simulator with Fernet encryption |
 | [Cybersecurity_Piscine/Reverse_me_i'm_famous!](#reverse_me_im_famous) | Cybersecurity | Reverse engineering binaries with GDB (3 levels: 32-bit → 64-bit) |
 | [Darkly](#darkly) | Cybersecurity | CTF with web vulnerabilities (OWASP Top 10) |
 | [dr-quine](#dr-quine) | Theoretical Recreation | Programs that print their own source code (quines) |
@@ -85,6 +86,38 @@ make stop           # Stop container
 ```
 
 **Technologies:** Docker, Docker Compose, Tor, Nginx, OpenSSH
+
+---
+
+## Cybersecurity_Piscine/Stockholm
+
+**Path:** [`Cybersecurity_Piscine/Stockholm/`](Cybersecurity_Piscine/Stockholm/)
+**Documentation:** [README](Cybersecurity_Piscine/Stockholm/README.md)
+
+**Educational ransomware simulator** demonstrating file encryption/decryption with **Fernet symmetric encryption**. Targets 100+ file extensions (WannaCry-style targeting) in a fully containerized environment with Docker Compose.
+
+**Operations:**
+- **Encryption** — Encrypts files in `~/infection` with auto-generated `stockholm.key`
+- **Decryption** — Restores encrypted files using the saved key file or key string
+
+**Features:**
+- ✅ Fernet encryption (AES-128 + HMAC-SHA256)
+- ✅ Automatic key generation and persistence
+- ✅ 100+ file type targeting
+- ✅ Recursive directory traversal
+- ✅ Dual-mode key loading (file or string)
+- ✅ Docker Compose setup with volume mapping to `./src/`
+
+**Quick Start:**
+```bash
+make start          # Build and start container
+make create-files   # Generate test files
+make test           # Run encryption
+make bash           # Enter container
+stockholm -r stockholm.key  # Decrypt (inside container)
+```
+
+**Technologies:** Python 3, cryptography (Fernet), Docker, Docker Compose
 
 ---
 
