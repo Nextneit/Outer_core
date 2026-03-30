@@ -1,7 +1,7 @@
 # stockholm
 
 Ransomware simulation for educational purposes only.
-Encrypts and decrypts files in `~/infection` using AES-256-GCM.
+Encrypts and decrypts files in `~/infection` using Fernet (AES-128-CBC + HMAC-SHA256).
 
 ## Dependencies
 
@@ -42,9 +42,9 @@ make
 
 ## Encryption
 
-**Algorithm: AES-256-GCM**
+**Algorithm: Fernet (AES-128-CBC + HMAC-SHA256)**
 
 - Symmetric, authenticated encryption (confidentiality + integrity)
-- 256-bit key — resistant to brute force
-- GCM mode detects tampering via authentication tag
+- HMAC-SHA256 detects any tampering before decryption
+- Key generated via `Fernet.generate_key()` — 32 bytes (base64), well above 16 char minimum
 - Provided by the `cryptography` library (built on OpenSSL)
