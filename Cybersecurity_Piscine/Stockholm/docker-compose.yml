@@ -1,0 +1,14 @@
+services:
+  stockholm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stockholm
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./stockholm.py:/usr/local/bin/stockholm
+      - ./infection:/root/infection
+    working_dir: /root
+    command: /bin/bash
