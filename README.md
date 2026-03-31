@@ -13,6 +13,7 @@ Collection of low-level, security, and systems projects. Each folder is an indep
 | [Cybersecurity_Piscine/ft_onion](#cybersecurity_piscineft_onion) | Cybersecurity | Tor hidden service with SSH access (Docker) |
 | [Cybersecurity_Piscine/Stockholm](#cybersecurity_piscinestockholm) | Cybersecurity | Educational ransomware simulator with Fernet encryption |
 | [Cybersecurity_Piscine/Reverse_me_i'm_famous!](#cybersecurity_piscinereverse_me_im_famous) | Cybersecurity | Reverse engineering binaries with GDB (3 levels: 32-bit → 64-bit) |
+| [Cybersecurity_Piscine/Inquisitor](#cybersecurity_piscineinquisitor) | Cybersecurity | ARP Poisoning and FTP traffic sniffing simulator in Docker |
 | [Darkly](#darkly) | Cybersecurity | CTF with web vulnerabilities (OWASP Top 10) |
 | [dr-quine](#dr-quine) | Theoretical Recreation | Programs that print their own source code (quines) |
 | [ft_ping](#ft_ping) | Networking / C | Reimplementation of `ping` command with raw sockets |
@@ -146,6 +147,29 @@ gdb ./binary/level1
 ```
 
 **Technologies:** GDB, x86/x86-64 assembly, ELF format analysis
+
+---
+
+## Cybersecurity_Piscine/Inquisitor
+
+**Path:** [`Cybersecurity_Piscine/Inquisitor/`](Cybersecurity_Piscine/Inquisitor/)
+**Documentation:** [README](Cybersecurity_Piscine/Inquisitor/README.md)
+
+**ARP Poisoning tool** with real-time FTP traffic interception, containerized in a complete multi-service Docker environment.
+
+- `inquisitor` script performs a full duplex man-in-the-middle (MITM) attack using ARP cache poisoning.
+- Automatically intercepts and displays FTP commands, including login credentials (`USER`, `PASS`) and file transfers (`RETR`, `STOR`).
+- Graceful shutdown automatically restores ARP tables of victims.
+
+**Quick Start:**
+```bash
+cd Cybersecurity_Piscine/Inquisitor
+make all        # Lift environment
+make ftp        # Start legitimate FTP session from client
+make attack     # Run MITM ARP Poisoning on the attacker node
+```
+
+**Technologies:** Python 3, `scapy`, Docker, Docker Compose, make
 
 ---
 
