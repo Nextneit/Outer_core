@@ -13,6 +13,7 @@ Collection of practical cybersecurity exercises. Each project explores different
 | [ft_onion](#ft_onion) | Networking / Docker | Tor hidden service deployment with SSH access |
 | [Stockholm](#stockholm) | Cryptography / Ransomware | Educational ransomware simulator with Fernet encryption |
 | [Reverse_me_i'm_famous!](#reverse_me_im_famous) | Reverse Engineering | Binary reverse engineering with GDB (3 levels: 32-bit → 64-bit) |
+| [Inquisitor](#inquisitor) | Networking / Sniffing | ARP Poisoning and FTP traffic sniffing simulator in Docker |
 
 ---
 
@@ -467,6 +468,46 @@ strings          # Extract text from binary
 objdump          # Disassemble and analyze
 readelf          # Read ELF headers
 strace / ltrace  # Trace syscalls and library calls
+```
+
+---
+
+## Inquisitor
+
+**Path:** [`Inquisitor/`](Inquisitor/)
+**Documentation:** [README](Inquisitor/README.md)
+
+**ARP Poisoning tool** with real-time FTP traffic interception, containerized in a complete multi-service Docker environment to safely simulate Man-In-The-Middle (MITM) attacks.
+
+### Overview
+
+`inquisitor` performs a bidirectional MITM attack using ARP cache poisoning. While the attack is active, it intercepts and displays FTP file transfer activity between a client and a server in real-time. Upon termination (`CTRL+C`), it automatically restores the original ARP tables.
+
+### Quick Start
+
+```bash
+cd Inquisitor
+make all        # Levanta servidor FTP, cliente y atacante
+make info       # Muestra IPs y direcciones MAC
+make ftp        # Abre una sesión FTP legítima
+make attack     # Ejecuta el ataque capturando contraseñas y transferencias
+make arp        # Comprueba las tablas ARP para confirmar el envenenamiento
+make clean      # Cierra contenedores y elimina volúmenes/redes
+```
+
+### Key Features
+
+- ✅ **ARP Poisoning (Full Duplex)**: Redirige el tráfico de ambas víctimas simultáneamente.
+- ✅ **FTP Sniffing**: Captura tráfico en el puerto 21 para extraer de comandos como `USER`, `PASS`, `RETR` y `STOR`.
+- ✅ **Auto-Restoration**: Al cancelar el ataque envía paquetes correctivos para restaurar el flujo de red.
+- ✅ **Docker Environment**: Entorno de pruebas seguro con contenedores aislados.
+
+### Learning Objectives
+
+- ✅ Ataques de red y spoofing en redes de área local (LAN)
+- ✅ Captura y análisis de paquetes de red (Sniffing) con Scapy.
+- ✅ Protocolos inseguros y visibilidad de credenciales no cifradas (FTP).
+- ✅ Aislamiento y orquestación de contenedores y redes en Docker.
 radare2          # Interactive analysis (alternative)
 ```
 
@@ -592,6 +633,5 @@ python3 ft_otp.py -k
 ## Next Steps
 
 Upcoming exercises planned for Cybersecurity Piscine:
-- Inquisitor (log analysis)
 - Vaccine (malware analysis)
 - Iron Dome (intrusion detection)
