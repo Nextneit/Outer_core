@@ -1,0 +1,75 @@
+# =============================================================================
+# docker-compose.yml — DVWA test environment
+#
+# Spins up:
+#   1. dvwa_target  -> DVWA (Damn Vulnerable Web Application) on port 8080
+#                     Legal, local SQL injection test target.
+#   2. juice_shop   -> OWASP Juice Shop (Node/SQLite) on port 3000
+#                     Includes challenges with SQLite-backed data layer.
+#
+# Usage:
+#   docker compose up -d
+#   python3 vaccine.py "http://localhost:8080/vulnerabilities/sqli/?id=1&Submit=Submit"
+#
+# DVWA first-run setup (browser):
+#   1. Open http://localhost:8080
+#   2. Login: admin / password
+#   3. Go to "DVWA Security" -> set to "Low"
+#   4. Go to "Setup / Reset DB" -> click "Create / Reset Database"
+#   5. Login again with admin / password
+# =============================================================================
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # DVWA — Damn Vulnerable Web Application
+  # A deliberately insecure PHP/MySQL application for legal testing.
+  # Image: https://hub.docker.com/r/vulnerables/web-dvwa
+  # ---------------------------------------------------------------------------
+  dvwa_target:
+    image: vulnerables/web-dvwa
+    container_name: dvwa_target
+    ports:
+      - "8080:80"          # http://localhost:8080 from the host browser
+    environment:
+      MYSQL_ROOT_PASSWORD: dvwa
+      MYSQL_DATABASE: dvwa
+      MYSQL_USER: dvwa
+      MYSQL_PASSWORD: dvwa
+    networks:
+      - vaccine_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/login.php"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # OWASP Juice Shop
+  # Vulnerable web app with challenges, backed by SQLite by default.
+  # Image: https://hub.docker.com/r/bkimminich/juice-shop
+  # ---------------------------------------------------------------------------
+  juice_shop:
+    image: bkimminich/juice-shop
+    container_name: juice_shop
+    ports:
+      - "3000:3000"       # http://localhost:3000
+    networks:
+      - vaccine_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  vaccine_net:
+    driver: bridge
+    name: vaccine_net
