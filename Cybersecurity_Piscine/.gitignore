@@ -4,8 +4,8 @@ data*
 *.jpg
 *.png
 __pycache__
-test_*
 *.key
 *.hex
 *.fernet
 infection
+output
