@@ -14,6 +14,7 @@ Collection of practical cybersecurity exercises. Each project explores different
 | [Stockholm](#stockholm) | Cryptography / Ransomware | Educational ransomware simulator with Fernet encryption |
 | [Reverse_me_i'm_famous!](#reverse_me_im_famous) | Reverse Engineering | Binary reverse engineering with GDB (3 levels: 32-bit → 64-bit) |
 | [Inquisitor](#inquisitor) | Networking / Sniffing | ARP Poisoning and FTP traffic sniffing simulator in Docker |
+| [Vaccine](#vaccine) | Web Security / SQL Injection | SQL injection detector/extractor (MySQL + SQLite) |
 
 ---
 
@@ -511,6 +512,44 @@ make clean      # Cierra contenedores y elimina volúmenes/redes
 radare2          # Interactive analysis (alternative)
 ```
 
+---
+
+## Vaccine
+
+**Path:** [`Vaccine/`](Vaccine/)
+**Documentation:** [README](Vaccine/README.md)
+
+`vaccine` is a local Python tool for SQL injection detection and data extraction against legal, controlled targets.
+
+### Features
+
+- ✅ Detection methods: Error-based, Union-based, Boolean-based, Time-based
+- ✅ HTTP methods: GET and POST
+- ✅ DB engine fingerprinting: MySQL and SQLite
+- ✅ Extraction: vulnerable parameters, payload traces, databases, tables, columns, and dump
+- ✅ Unit test suite included
+
+### Local Lab Targets
+
+- `DVWA` (MySQL): `http://localhost:8080`
+- `sqlite_lab` (Flask + SQLite): `http://localhost:5001`
+
+### Quick Start
+
+```bash
+cd Vaccine
+make start
+python3 vaccine.py "http://localhost:8080/vulnerabilities/sqli/?id=1&Submit=Submit"
+python3 vaccine.py "http://localhost:5001/?user=admin" --no-auth
+```
+
+### Run Tests
+
+```bash
+cd Vaccine
+make test
+```
+
 ### Key Concepts
 
 **Level 1:**
@@ -633,5 +672,4 @@ python3 ft_otp.py -k
 ## Next Steps
 
 Upcoming exercises planned for Cybersecurity Piscine:
-- Vaccine (malware analysis)
 - Iron Dome (intrusion detection)
