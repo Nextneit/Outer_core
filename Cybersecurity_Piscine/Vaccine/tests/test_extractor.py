@@ -31,13 +31,42 @@ class TestExtractor(unittest.TestCase):
             return DummyResponse("T" * 100)
 
         with patch("core.extractor.inject_payload", side_effect=fake_inject_payload):
-            vulnerable = extractor.discover_vulnerable_parameters(
+            vulnerable, payloads = extractor.discover_vulnerable_parameters_with_payloads(
                 None,
                 "http://localhost/?id=1&Submit=Submit",
                 "GET",
             )
 
         self.assertIn("id", vulnerable)
+        self.assertTrue(any("TRUE=" in p for p in payloads))
+
+    def test_sqlite_extraction_ignores_reflected_query(self):
+        reflected = (
+            "<b>Consulta ejecutada:</b><code>SELECT '"
+            + extractor.START_MARK
+            + "'||IFNULL((SELECT 'main'),'')||'"
+            + extractor.END_MARK
+            + "'</code>"
+            "<b>Resultados:</b>[('"
+            + extractor.START_MARK
+            + "main"
+            + extractor.END_MARK
+            + "',)]"
+        )
+
+        with patch("core.extractor.inject_payload", return_value=DummyResponse(reflected)):
+            value = extractor._extract_single_value(
+                None,
+                "http://localhost:5001/?user=admin",
+                "GET",
+                "user",
+                "sqlite",
+                1,
+                0,
+                "SELECT 'main'",
+            )
+
+        self.assertEqual(value, "main")
 
 
 if __name__ == "__main__":

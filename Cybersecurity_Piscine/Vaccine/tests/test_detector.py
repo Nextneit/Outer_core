@@ -41,6 +41,36 @@ class TestDetector(unittest.TestCase):
 
         self.assertTrue(found)
 
+    def test_union_based_detection_sqlite_positive(self):
+        with patch(
+            "core.detector.inject_payload",
+            return_value=DummyResponse("<html>result VXUNIONMARK</html>")
+        ):
+            found = detector.detect_union_based(
+                None,
+                "http://x/?user=admin",
+                "GET",
+            )
+
+        self.assertTrue(found)
+
+    def test_union_based_ignores_marker_in_reflected_code_block(self):
+        reflected_only = (
+            "<b>Query:</b><code>SELECT 'VXUNIONMARK' FROM users WHERE username='...'</code>"
+            "<b>Results:</b>[]"
+        )
+        with patch(
+            "core.detector.inject_payload",
+            return_value=DummyResponse(reflected_only)
+        ):
+            found = detector.detect_union_based(
+                None,
+                "http://x/?user=admin",
+                "GET",
+            )
+
+        self.assertFalse(found)
+
 
 if __name__ == "__main__":
     unittest.main()

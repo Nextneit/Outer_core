@@ -24,4 +24,9 @@ def parse_args():
         action="store_true",
         help="Muestra información detallada de requests y detección",
     )
+    parser.add_argument(
+        "--no-auth",
+        action="store_true",
+        help="Salta la autenticación DVWA (usar con targets que no requieren login)",
+    )
     return parser.parse_args()

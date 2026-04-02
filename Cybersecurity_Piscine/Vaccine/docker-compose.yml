@@ -4,8 +4,8 @@
 # Spins up:
 #   1. dvwa_target  -> DVWA (Damn Vulnerable Web Application) on port 8080
 #                     Legal, local SQL injection test target.
-#   2. juice_shop   -> OWASP Juice Shop (Node/SQLite) on port 3000
-#                     Includes challenges with SQLite-backed data layer.
+#   2. sqlite_lab   -> Local Flask+SQLite vulnerable lab on port 5001
+#                     Built from Dockerfile in this directory.
 #
 # Usage:
 #   docker compose up -d
@@ -47,24 +47,26 @@ services:
       start_period: 30s
 
   # ---------------------------------------------------------------------------
-  # OWASP Juice Shop
-  # Vulnerable web app with challenges, backed by SQLite by default.
-  # Image: https://hub.docker.com/r/bkimminich/juice-shop
+  # sqlite_lab
+  # Simple Flask app intentionally vulnerable to SQLite injection.
+  # Built from local Dockerfile + app.py.
   # ---------------------------------------------------------------------------
-  juice_shop:
-    image: bkimminich/juice-shop
-    container_name: juice_shop
+  sqlite_lab:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sqlite_lab
     ports:
-      - "3000:3000"       # http://localhost:3000
+      - "5001:5000"       # http://localhost:5001
     networks:
       - vaccine_net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000"]
-      interval: 15s
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:5000/"]
+      interval: 10s
       timeout: 5s
-      retries: 20
-      start_period: 60s
+      retries: 10
+      start_period: 15s
 
 # =============================================================================
 # Networks

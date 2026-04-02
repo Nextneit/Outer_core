@@ -1,7 +1,7 @@
 help:
 	@echo "vaccine - Makefile targets:"
-	@echo "  make                - Start DVWA and Juice Shop targets (default)"
-	@echo "  make start          - Create .venv, install requirements and start targets"
+	@echo "  make                - Start all test targets (DVWA, sqlite_lab)"
+	@echo "  make start          - Create .venv, install requirements and start all targets"
 	@echo "  make stop           - Stop running containers"
 	@echo "  make down           - Stop and remove containers/networks"
 	@echo "  make clean          - Remove containers, caches, output and .venv"
@@ -18,7 +18,7 @@ start:
 	@echo "[+] Entorno virtual creado en: .venv"
 	@echo "[+] Dependencias instaladas desde requirements.txt"
 	@echo "[+] DVWA disponible en: http://localhost:8080"
-	@echo "[+] Juice Shop (SQLite) disponible en: http://localhost:3000"
+	@echo "[+] SQLite Lab (Flask) disponible en: http://localhost:5001"
 	@echo "[+] Entornos de prueba levantados"
 
 stop:
@@ -38,7 +38,7 @@ clean:
 	@echo "[+] Entorno limpiado"
 
 logs:
-	docker compose logs -f dvwa_target juice_shop
+	docker compose logs -f dvwa_target sqlite_lab
 
 test:
 	python3 -m unittest discover -s tests -v

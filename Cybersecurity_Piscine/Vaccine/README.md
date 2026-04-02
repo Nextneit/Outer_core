@@ -4,7 +4,7 @@ SQL Injection detection and extraction tool for the Cybersecurity Piscine subjec
 
 ## Description
 
-This project runs the scanner locally with Python and targets a vulnerable web app deployed with Docker Compose.
+This project runs the scanner locally with Python and targets vulnerable web apps deployed with Docker Compose.
 
 Current capabilities:
 
@@ -17,7 +17,7 @@ Current capabilities:
 
 - Python 3.10+
 - pip
-- Docker and Docker Compose (only for DVWA target)
+- Docker and Docker Compose (for local test targets)
 
 Install Python dependency:
 
@@ -52,15 +52,20 @@ Options:
 - -o, --output: output file path (default output/results.txt)
 - -v, --verbose: detailed request and detection trace
 
-## Local Target Environment (DVWA)
+## Local Target Environments (DVWA + sqlite_lab)
 
-Start DVWA:
+Start local test targets:
 
 ```bash
 make start
 ```
 
-Then complete first-time setup in browser:
+Available URLs:
+
+1. DVWA (MySQL): http://localhost:8080
+2. sqlite_lab (Flask + SQLite): http://localhost:5001
+
+DVWA first-time setup:
 
 1. Open http://localhost:8080
 2. Login with admin / password
@@ -77,14 +82,14 @@ make clean
 
 ## Makefile Targets
 
-- make or make start: start DVWA
+- make or make start: create .venv, install requirements and start DVWA + sqlite_lab
 - make stop: stop containers
 - make down: remove containers and networks
 - make clean: full docker cleanup plus Python cache cleanup
-- make logs: follow DVWA logs
+- make logs: follow DVWA + sqlite_lab logs
 - make run URL="...": run vaccine locally against URL
 - make test: run unit tests
-- make check: start DVWA and run unit tests
+- make check: start targets and run unit tests
 - make re: clean and start again
 
 ## Project Structure
@@ -137,4 +142,4 @@ Coverage includes:
 
 ## Legal Notice
 
-Use this tool only on systems you own or where you have explicit authorization. The intended target for this repository is the local DVWA environment defined in docker-compose.yml.
+Use this tool only on systems you own or where you have explicit authorization. The intended targets for this repository are the local DVWA and sqlite_lab environments defined in docker-compose.yml.
