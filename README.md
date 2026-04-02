@@ -14,6 +14,7 @@ Collection of low-level, security, and systems projects. Each folder is an indep
 | [Cybersecurity_Piscine/Stockholm](#cybersecurity_piscinestockholm) | Cybersecurity | Educational ransomware simulator with Fernet encryption |
 | [Cybersecurity_Piscine/Reverse_me_i'm_famous!](#cybersecurity_piscinereverse_me_im_famous) | Cybersecurity | Reverse engineering binaries with GDB (3 levels: 32-bit → 64-bit) |
 | [Cybersecurity_Piscine/Inquisitor](#cybersecurity_piscineinquisitor) | Cybersecurity | ARP Poisoning and FTP traffic sniffing simulator in Docker |
+| [Cybersecurity_Piscine/Vaccine](#cybersecurity_piscinevaccine) | Cybersecurity | SQL injection detector/extractor (MySQL + SQLite) with local test targets |
 | [Darkly](#darkly) | Cybersecurity | CTF with web vulnerabilities (OWASP Top 10) |
 | [dr-quine](#dr-quine) | Theoretical Recreation | Programs that print their own source code (quines) |
 | [ft_ping](#ft_ping) | Networking / C | Reimplementation of `ping` command with raw sockets |
@@ -170,6 +171,34 @@ make attack     # Run MITM ARP Poisoning on the attacker node
 ```
 
 **Technologies:** Python 3, `scapy`, Docker, Docker Compose, make
+
+---
+
+## Cybersecurity_Piscine/Vaccine
+
+**Path:** [`Cybersecurity_Piscine/Vaccine/`](Cybersecurity_Piscine/Vaccine/)
+**Documentation:** [README](Cybersecurity_Piscine/Vaccine/README.md)
+
+SQL injection analysis tool executed locally in Python against controlled vulnerable targets.
+
+- Detection methods: Error-based, Union-based, Boolean-based, Time-based
+- Supported request methods: GET and POST
+- Engine fingerprinting: MySQL and SQLite
+- Extraction outputs: vulnerable parameters, payload traces, database/table/column names and full dump
+
+**Local Targets (Docker Compose):**
+- DVWA (MySQL): `http://localhost:8080`
+- sqlite_lab (Flask + SQLite): `http://localhost:5001`
+
+**Quick Start:**
+```bash
+cd Cybersecurity_Piscine/Vaccine
+make start
+python3 vaccine.py "http://localhost:8080/vulnerabilities/sqli/?id=1&Submit=Submit"
+python3 vaccine.py "http://localhost:5001/?user=admin" --no-auth
+```
+
+**Technologies:** Python 3, `requests`, Docker, Docker Compose, make
 
 ---
 
