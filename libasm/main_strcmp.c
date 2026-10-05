@@ -31,10 +31,6 @@ int main(void) {
             printf("  strcmp    -> %d\n", res_lib);
         else
             printf("  strcmp    -> (no se llama con NULL)\n");
-        printf("  signo asm: %d, signo libc: %s\n\n",
-               (res_asm>0) - (res_asm<0),
-               (res_lib==INT_MIN) ? "(n/a)" :
-               ((res_lib>0) ? "positivo" : (res_lib<0) ? "negativo" : "cero"));
     }
 
     return 0;
