@@ -13,7 +13,7 @@ int main(void) {
     memset(dst_libc, 0x2A, sizeof(dst_libc));
 
     /* llamar a la función en ensamblador */
-    char *ret = ft_strcpy(dst, src);
+    ft_strcpy(dst, src);
 
     /* comparar con strcpy de la libc */
     strcpy(dst_libc, src);
