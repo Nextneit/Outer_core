@@ -8,5 +8,7 @@ int main(void) {
     const char *s = "hola desde asm\n";
     ssize_t r = ft_write(1, s, strlen(s));
     printf("ft_write returned: %zd\n", r);
+    ssize_t o = write(1, s, strlen(s));
+    printf("ft_write returned: %zd\n", o);
     return 0;
 }
