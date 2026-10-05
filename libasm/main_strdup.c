@@ -16,15 +16,15 @@ void test_strdup(const char *test_name, const char *input) {
     
     // Compare results
     if (original == NULL && ft_result == NULL) {
-        printf("✅ Both returned NULL\n");
+        printf("Both returned NULL\n");
     } else if (original != NULL && ft_result != NULL) {
         if (strcmp(original, ft_result) == 0) {
-            printf("✅ Strings match!\n");
+            printf("Strings match!\n");
         } else {
-            printf("❌ Strings differ!\n");
+            printf("Strings differ!\n");
         }
     } else {
-        printf("❌ One returned NULL, the other didn't!\n");
+        printf("One returned NULL, the other didn't!\n");
     }
     
     // Free memory
@@ -33,7 +33,7 @@ void test_strdup(const char *test_name, const char *input) {
 }
 
 int main(void) {
-    printf("🧪 Testing ft_strdup function\n");
+    printf("Testing ft_strdup function\n");
     printf("================================\n");
     
     // Test cases
@@ -52,12 +52,12 @@ int main(void) {
     char *ft_null = ft_strdup(NULL);
     printf("ft_strdup result: %p -> \"%s\"\n", (void *)ft_null, ft_null ? ft_null : "(NULL)");
     if (ft_null == NULL) {
-        printf("✅ ft_strdup correctly returned NULL for NULL input\n");
+        printf("ft_strdup correctly returned NULL for NULL input\n");
     } else {
-        printf("❌ ft_strdup should return NULL for NULL input\n");
+        printf("ft_strdup should return NULL for NULL input\n");
         free(ft_null);
     }
     
-    printf("\n🎉 All tests completed!\n");
+    printf("\nAll tests completed!\n");
     return 0;
 }
