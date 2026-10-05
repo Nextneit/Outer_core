@@ -20,7 +20,6 @@ int main(void) {
 
     printf("src:      \"%s\"\n", src);
     printf("dst (asm):\"%s\"\n", dst);
-    printf("ret == dst: %s\n", (ret == dst) ? "sí" : "no");
     printf("dst (libc):\"%s\"\n", dst_libc);
 
     return 0;
